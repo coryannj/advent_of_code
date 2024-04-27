@@ -185,12 +185,21 @@ let remaining = {}
 for (const line of lines) {
   let memoarray = []
   memoarray.push(line.join(' '))
-  let springs = line[0].match(lineSplitRegex)
   let broken = line[1].split(',').map(Number)
+
+  let brokeregexstr = broken.flatMap((x)=> [`([?#]{${x}})`,`([?.]+)`]).slice(0,-1).join('')
+  let brokenregex = new RegExp(brokeregexstr,"g")
+  const regexdots = /([.]{2,})/g
+  // let springs = line[0].match(brokenregex).join('').split('.').filter((x)=> x.length>0) // split on dots since they don't add to combos count
+
+  let springs = line[0].match(brokenregex)[0].replace(regexdots,'.').split('.')
+  
+  //.map((x)=> x.replace(regexdots,'.')).flatMap((y)=> y.split('.'))
+
   let conditions = getConditions(springs,broken)
   let springsmin = springs.join('').length+springs.length-1 
   let brokenmin = broken.reduce((acc,curr) => acc + curr,0) + broken.length-1 
-  //let sparechars = springsmin-brokenmin // degrees of freedom
+  let sparechars = springsmin-brokenmin // degrees of freedom
   let whilekey = `${springs.join('.')} ${broken.join(',')}`
   memoarray.push(whilekey)
 
@@ -199,6 +208,7 @@ for (const line of lines) {
   console.log(springsmin)
   console.log(broken)
   console.log(brokenmin)
+  console.log(sparechars)
 
   // Process lines as much as possible
   while (
@@ -278,14 +288,15 @@ for (const line of lines) {
     conditions = getConditions(springs,broken)
     springsmin = springs.join('').length+springs.length-1 // if we reintroduce min no. of dots
     brokenmin = broken.reduce((acc,curr) => acc + curr,0) + broken.length-1 // with min no. of dots
-    //sparechars = springsmin-brokenmin // degrees of freedom
+    sparechars = springsmin-brokenmin // degrees of freedom
     whilekey = `${springs.join('.')} ${broken.join(',')}`
     memoarray.push(whilekey)
     console.log('******* after truncation**********')
-    console.log(springs)
-    console.log(springsmin)
-    console.log(broken)
-    console.log(brokenmin)
+    console.log(springs,broken,sparechars)
+     //console.log(springs)
+    //console.log(springsmin)
+    //console.log(broken)
+    //console.log(brokenmin)
     console.log(whilekey)
 
 
@@ -506,6 +517,8 @@ console.log(Array.from(new Set([...permute(testpartitions)].map(JSON.stringify))
 
 
 
+let brokenarrtest = [ 6, 1, 1 ]
+console.log(brokenarrtest.flatMap((x)=> [`([?#]{${x}})`,`([?.]+)`]).slice(0,-1).join(''))
 
   // let regex = ''
   // // Generate regex string to trim dots from start/end
