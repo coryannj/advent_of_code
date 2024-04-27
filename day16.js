@@ -28,7 +28,6 @@ function getNext([x,y,direction]) {
     '/': {'R':[up],'L':[down],'U':[right],'D':[left]},
     '\\':{'R':[down],'L':[up],'U':[left],'D':[right]}
   }
-  //console.log('nextmap',nextmap[encounter][direction].filter((z)=> (z[0]>=0 && z[0]<xlength) && (z[1]>=0 && z[1]<ylength)))
   return nextmap[encounter][direction].filter((z)=> (z[0]>=0 && z[0]<xlength) && (z[1]>=0 && z[1]<ylength)) // filters out negative values
 }
 
@@ -40,7 +39,6 @@ function nextBeam(arrofarrs) {
   while (thisarrofarrs.length > 0) {
     let nextdirections = []
     for (step of thisarrofarrs) {
-      //console.log('step is',step)
         let nextarr=[]
         if (seen.includes(step.join(',')) === false) {
           let encounter = lines[step[0]][step[1]]
@@ -55,7 +53,6 @@ function nextBeam(arrofarrs) {
           }
           seenlines[step[0]][step[1]] = 'S'
           nextarr = getNext(step)
-          //console.log('nextarr is',nextarr)
           if (nextarr.length>0) {
             if (nextarr.length === 1) {
               nextdirections.push(nextarr[0])
@@ -64,83 +61,37 @@ function nextBeam(arrofarrs) {
             nextdirections.push(nextarr[1]);
             }
           }
-        } 
-
-        // if (seen.includes(step.join(',')) === false) {
-        //   seen.push(step.join(','))
-        //   seenlines[step[0]][step[1]] = 'S'
-        //   nextarr = getNext(step)
-        //   //console.log('nextarr is',nextarr)
-        //   if (nextarr.length>0) {
-        //     if (nextarr.length === 1) {
-        //       nextdirections.push(nextarr[0])
-        //     } else {
-        //     nextdirections.push(nextarr[0]);
-        //     nextdirections.push(nextarr[1]);
-        //     }
-        //   }
-        // } 
+        }  
       }
-      //console.log('nextdirections is',nextdirections)
     thisarrofarrs = nextdirections
   }
-
-  let seenmap = seen.map((z)=> z.match(coordRegex).join(''))
-//   console.log('**************-SEEN-**************')
-// console.log(seen.length)
-// console.log(seen)
-// console.log('**************-SEENMAP-**************')
-// console.log(seenmap)
- //console.log('**************-SEENLINES_ARRAY-**************')
- //console.log(seenlines.map((x)=> x.join('')))
- //console.log(seenlines.flat().filter((x)=> x==='S').length)
- // let energised = new Set (seenmap)
- //console.log('energised is ',energised)
- //console.log('energised size is',energised.size)
- // return energised.size
- return seenlines.flat().filter((x)=> x==='S').length
-
+  return seenlines.flat().filter((x)=> x==='S').length
 }
 
-console.log(nextBeam(start))
-
-
-// console.log('**************-SEEN-**************')
-// console.log(seen.length)
-// console.log(seen)
-// console.log('**************-SEENMAP-**************')
-// console.log(seen.map((z)=> [z[0],z[1]].join(',')))
-// console.log('**************-ARRAY-**************')
-// console.log(seenlines.map((x)=> x.join('')))
-// let seenmap = seen.map((z)=> [z[0],z[1]].join(','))
-// let energised = new Set (seenmap)
-// console.log('energised is ',energised)
-// console.log('energised size is',energised.size)
-
-
+console.log(nextBeam(start)) // Part 1 answer
 
 //Part 2
+
 let part2start=[]
+
 //top and bottom rows start positions
 for(i=0;i<ylength;i++){
   part2start.push([0,i,'D']);
   part2start.push([ylength-1,i,'U'])
 }
+
 //right and left cols start positions
 for(i=0;i<xlength;i++) {
   part2start.push([i,0,'R'])
   part2start.push([i,xlength-1,'L'])
 }
 
-//console.log(part2start)
-
 let currmax=0
+
+// Loop through all possible edge co-ords/directions to get all possible routes and take max
 for (item of part2start) {
-  console.log('start is ',item)
-  //console.log('seen is',seen)
   thisstart = [item]
   let thismax = nextBeam(thisstart)
-  console.log('currmax is',currmax,' thismax is',thismax)
   thismax > currmax ? currmax=thismax : currmax=currmax
 }
 
