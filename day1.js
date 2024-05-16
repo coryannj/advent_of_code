@@ -5,22 +5,21 @@ const input = inputload.split(/[\r\n]+/)
 //Part 1
 
 //Regex to get first and last digits
-let firstlastregex = /(?<=^\D*)(\d)|(\d)(?=\D*$)/gm
+let part1regex = /(?<=^\D*)(\d)|(\d)(?=\D*$)/gm
 
 //Map runs above regex on each line and checks for string length. If 1 then concat to itself, then convert to number and sum the array
 let calibrationsum1 = input
 .map((x) => {
-    let match = x.match(firstlastregex).join('')
-    return match.length>1 ? parseInt(match):parseInt(match.concat(match))
+    let match = x.match(part1regex).join('')
+    return match.length>1 ? parseInt(match) : parseInt(match+match)
 })
 .reduce((acc,curr) => acc + curr,0)
 console.log(calibrationsum1) // Part 1 answer
 
 //Part 2
 
-//Regex - seperate for first and last bc of overlapping letters ugh
-let firstregex = /(one|two|three|four|five|six|seven|eight|nine|\d).*/
-let lastregex = /.*(one|two|three|four|five|six|seven|eight|nine|\d)/
+//Regex to get overlapping matches using positive lookahead
+let part2regex = /(?=(one|two|three|four|five|six|seven|eight|nine|\d))/gm
 
 let replacelookup = {
     'one': '1',
@@ -34,16 +33,14 @@ let replacelookup = {
     'nine':'9'
 }
 
-function replacewords(str) {
-    return str.length === 1 ? str : replacelookup[str]
-}
-
 //Map runs regex and replaces words by lookup, then sum array with reduce
 let calibrationsum2 = input
 .map((x) => {
-    let first = replacewords(x.match(firstregex)[1])
-    let last = replacewords(x.match(lastregex)[1])
-    return last.length>0 ? parseInt(first.concat(last)):parseInt(first.concat(first))
+    let match = [...x.matchAll(part2regex)]
+    .filter((y,idx,arr)=> idx === 0 || idx === arr.length-1)
+    .map((z)=> replacelookup[z[1]] === undefined ? z[1] : replacelookup[z[1]])
+    .join('')
+    return match.length>1 ? parseInt(match) : parseInt(match+match)
 })
 .reduce((acc,curr) => acc + curr,0)
 console.log(calibrationsum2) // Day 2 answer
