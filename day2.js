@@ -23,17 +23,12 @@ const regexred = /\d+(?= red)/g
 const regexgreen = /\d+(?= green)/g
 const regexblue = /\d+(?= blue)/g
 
-// Function to get Max value in array of numbers
-function maxOfArray(array) {
-     return Math.max.apply(Math, array);
-   }
-
 // Map uses regex to get array of values for each colour, finds maximum for each and multiplies to get the power, then sums array
 let gamespowersum = input
 .map((x) => {
-    let maxred = maxOfArray(x.match(regexred).map((x) => parseInt(x)))
-    let maxgreen = maxOfArray(x.match(regexgreen).map((x) => parseInt(x)))
-    let maxblue = maxOfArray(x.match(regexblue).map((x) => parseInt(x)))
+    let maxred = Math.max(...x.match(regexred).map(Number))
+    let maxgreen = Math.max(...x.match(regexgreen).map(Number))
+    let maxblue = Math.max(...x.match(regexblue).map(Number))
     return maxred*maxgreen*maxblue
 }).reduce((acc,curr) => acc + curr,0)
 console.log(gamespowersum)
