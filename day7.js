@@ -1,100 +1,73 @@
 const fs = require('fs');
 const input = fs.readFileSync('../day7input.txt',{ encoding: 'utf8', flag: 'r' });
+const hands = input.split(/[\r\n]+/)
 
-//Part 1
+// Map to enable lexographical sorting - each hand will end up as `${Prepend with hand rank}${p1rank -> p1adjusted mapping}`
+const p1rank = '123456789TJQKA'
+const p1adjusted = 'abcdefjklmnopq'
+const p2rank = 'J123456789TQKA'
+const p2adjusted = 'abcdefjklmnopq'
 
-// Map for lexographical sorting
-let score = '123456789TJQKA'
-let adjustedscore = 'abcdefjklmnopq'
+const handRegex = /(.)\1*/g // Get all individual groups in string with length of that card e.g. 'TTTJJ' -> ['TTT','JJ']
 
-const allhands = input.split(/[\r\n]+/)
-.map((x)=> {
+function getHand (hand,p1orp2) {
+    let handMap, jokers, ranking, handRank;
 
-  let hand = x.substring(0,5).split('').map((x) => adjustedscore[score.indexOf(x)]) // maps to letters so we can use lexographical sort e.g. 'KKKKK' -> 'ppppp'
-  let bid = parseInt(x.substring(6))
-  let handvalue
-  
-  // Work out what poker hand it is - use Set to minimise need to count chars
-  // After we work out what hand - prepend value based on hand rank from 1-7 so when we sort array it's doing hand strength AND first/second/third chars etc all in one go e.g. '11111' will end up as '7aaaaa'
-
-  let handset = new Set(hand)
-
-  if (handset.size === 1) {
-    handvalue = '7'.concat(hand.join('')) // Five of a kind
-  } else if (handset.size === 5) {
-    handvalue = '1'.concat(hand.join('')) // High card
-  } else if (handset.size === 4) {
-    handvalue = '2'.concat(hand.join('')) // One pair
-  } else if (handset.size === 2) {
-    if (hand.toSorted().join('').match(/([^])\1{3}/g) != null) {
-      handvalue = '6'.concat(hand.join('')) // Four of a kind
+    if (p1orp2 === 'part1') {
+        handMap = hand.split('').map((card)=> p1adjusted.charAt(p1rank.indexOf(card))); // '12345' -> 'abcde'
     } else {
-      handvalue = '5'.concat(hand.join('')) // Full house
+        handMap = hand.split('').map((card)=> p2adjusted.charAt(p2rank.indexOf(card)));
     }
-  } else if (handset.size === 3) {
-    if (hand.toSorted().join('').match(/([^])\1{2}/g) != null) {
-      handvalue = '4'.concat(hand.join('')) // Three of a kind
+    
+    handRank = handMap.toSorted().join('').match(handRegex); // 'ababa' -> ['aaa','bb'] 
+
+    if (handRank.length === 1) {
+      ranking = 7 // Five of a kind
     } else {
-      handvalue = '3'.concat(hand.join('')) // Two pair
+      p1orp2 === 'part2' && hand.includes('J') ? jokers = handRank.shift() : '' // For part 2 - separate jokers
+
+      var countCard = handRank.map((x)=> x.length).sort().reverse(); // Map to number of each card found & sort desc e.g. ['TT','J','KK'] => [2,2,1]
+
+      jokers !== undefined ? countCard[0]+=jokers.length : '' // add count of jokers to most common card
+
+      switch (true) {
+         case (countCard.length === 5):
+            ranking = 1 // High card
+            break;
+         case (countCard.length === 4):
+            ranking = 2 // One pair 
+            break;
+         case (countCard.indexOf(2) !== countCard.lastIndexOf(2)):
+            ranking = 3 // Two pair 
+            break;
+         case (countCard.includes(3) && !countCard.includes(2)):
+            ranking = 4 // 3 of a kind
+            break;
+         case (countCard.includes(3) && countCard.includes(2)):
+            ranking = 5 // Full house
+            break;
+         case (countCard.includes(4)):
+            ranking = 6 // Four of a kind
+            break;
+      }
     }
-  }
-  return [handvalue,bid]
-})
-.sort((a,b) => {return a[0] === b[0] ? 0 : a[0]< b[0] ? -1 : returnval=1}) // Sorts rank by hand
-.reduce((acc,curr,index) => acc + ((index+1)*curr[1]),0) // Sums rank * bid
-console.log(allhands)
 
-// Part 2
+  return `${ranking}${handMap.join('')}` // 'KKKKK' => '7ppppp' 
+}
 
-// Map for lexographical sorting - changing for J
-let scorepart2 = 'J123456789TQKA'
-let adjustedscorepart2 = 'abcdefjklmnopq'
+//Part 1 and Part 2
+let p1array = [], p2array = []
 
-const allhandspart2 = input.split(/[\r\n]+/)
-.map((x)=> {
+hands.forEach((thisHand)=>{
+   let [cards,bid] = thisHand.split(' ');
+   p1array.push([getHand(cards,'part1'),parseInt(bid)]);
+   p2array.push([getHand(cards,'part2'),parseInt(bid)]);
+}) 
 
-  let hand = x.substring(0,5).split('').map((x) => adjustedscorepart2[scorepart2.indexOf(x)]) // maps to corr. letter
-  let bid = parseInt(x.substring(6))
-  let handvalue
-  
-  // Work out what poker hand it is - use Set to minimise need to count chars
-  // After we work out what hand - prepend value based on hand rank from 1-7 so when we sort array it's doing hand strength AND first/second/third chars etc all in one go e.g. '11111' will end up as '7aaaaa'
+console.log(p1array.sort((a,b)=>a[0].localeCompare(b[0]))
+.map((rank,ridx)=>rank[1]*(ridx+1))
+.reduce((acc,curr)=>acc+curr)) // Part 1 answer
 
-  let handset = new Set(hand)
-  let notjset = new Set(hand.filter((x) => x !== 'a'))
-  let jcount = hand.toSorted().join('').match(/\a+/g)
-
-  if (handset.size === 1 || notjset.size === 1) {
-    handvalue = 7 // Five of a kind
-  } else if (handset.size === 5) {
-    handvalue = 1 // High card
-    if (jcount !== null) {handvalue++} // High card -> One pair if J found
-  } else if (handset.size === 4) {
-    handvalue = 2 // One pair
-    if (jcount !== null) {handvalue=handvalue+2} // One pair -> 3 of a kind if J found
-  } else if (handset.size === 2) {
-    if (hand.toSorted().join('').match(/([^])\1{3}/g) != null) {
-      handvalue = 6 // Four of a kind - J not possible in this if block
-    } else {
-      handvalue = 5 // Full house - J not possible in this if block
-    }
-  } else if (handset.size === 3) {
-    if (hand.toSorted().join('').match(/([^])\1{2}/g) != null) {
-      handvalue = 4 // Three of a kind
-      if (jcount !== null) {handvalue=handvalue+2} // Three of a kind => Four of a kind if J found
-    } else {
-      handvalue = 3; // Two pair
-      if (jcount !== null) {
-        if(jcount[0].length === 2) {
-          handvalue=handvalue+3 // Two pair -> Four of a kind if two Jacks
-        } else {
-          handvalue=handvalue+2 // Two pair -> Full house if one J
-        } 
-      }      
-    }
-  }
-  return [handvalue+hand.join(''),bid]
-})
-.sort((a,b) => {return a[0] === b[0] ? 0 : a[0]< b[0] ? -1 : returnval=1}) // Sorts by hand then rank
-.reduce((acc,curr,index) => acc + ((index+1)*curr[1]),0) // Sums rank * bid
-console.log(allhandspart2)
+console.log(p2array.sort((a,b)=>a[0].localeCompare(b[0]))
+.map((rank,ridx)=>rank[1]*(ridx+1))
+.reduce((acc,curr)=>acc+curr)) // Part 2 answer
