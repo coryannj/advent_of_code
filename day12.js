@@ -5,6 +5,18 @@ const lines = input.split(/[\r\n]+/).map((x)=> x.split(' '))
 const hashregex=/([#]+)/g
 const lineSplitRegex=/([^.]+)/g
 
+let teststr = '?###????????'
+let regex = /(?=([#?]{3}))(?=[.?]*?)(?=[#?]{2})(?=[.?]*?)(?=[#?]{1})/g
+console.log([...teststr.matchAll(regex)])
+console.log(teststr.match(regex))
+
+let test2 = '????????'
+let reg2 = /(?=([#?]{2}))(?=[.?]*?|[.?]+)(?=([#?]))/g
+
+console.log([...test2.matchAll(reg2)])
+console.log(test2.match(reg2))
+
+
 //Part 1
 
 /* 
@@ -28,7 +40,7 @@ const lineSplitRegex=/([^.]+)/g
   5. Memoisation:
     - Full input string/spring groups/trimmed spring groups with option count
     - Integer partitions
-    - Interger partitions combinations for given array length
+    - Integer partitions combinations for given array length
 
 */
 
