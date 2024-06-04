@@ -1,7 +1,360 @@
 const fs = require('fs');
 const { get } = require('https');
 const input = fs.readFileSync('../day12input.txt',{ encoding: 'utf8', flag: 'r' });
-const lines = input.split(/[\r\n]+/).map((x)=> x.split(' '))
+
+let lines = input.split(/[\r\n]+/).map((x)=> {let [a,b]=x.split(' '); return [a,b.split(',').map((n)=>parseInt(n))]})
+
+
+
+let firstlastcharregex = /(^#)|(#$)/m
+
+
+// let lines = linesoriginal.filter(([spring,broken])=>{
+//   let springSpl = spring.split('.').filter((e)=>e.includes('#'))
+//   let oneCheck = springSpl.length === broken.length
+//   && (springSpl.every((y,yidx)=> !!firstlastcharregex.test(y) || y.length === broken[yidx] || broken[yidx] === 1))
+//   return !oneCheck
+// })
+
+// sum+=(linesoriginal.length-lines.length)
+
+// console.log('sum is ',sum)
+
+function getArrangements (spr,br,p1orp2) {
+
+  let springsSplit
+  let brokenMap
+  if (p1orp2 === 'p1') {
+    springsSplit = spr.split('')
+    brokenMap = br.map((x)=> '#'.repeat(x)).join('.').split('')
+  } else {
+    let unfolded = Array(5).fill(spr).join('?').replaceAll(/[.]+/g,'.').replaceAll(/^[.]+/gm,'').replaceAll(/[.]+\s/gm,' ')
+    //console.log('unfolded',unfolded)
+
+    unfolded = unfolded.replaceAll(/[.]+/g,'.').replaceAll(/^[.]+/gm,'').replaceAll(/[.]+\s/gm,' ')
+    //console.log('unfolded replaceALL ',unfolded)
+    springsSplit = unfolded.split('')
+    brokenMap = Array(5).fill(br.join(',')).flatMap((x)=> x.split(',').map((y)=> parseInt(y))).map((z)=> '#'.repeat(z)).join('.').split('')
+  }
+
+  let wriggle = springsSplit.length-brokenMap.length
+
+  let states = ['.'].concat(brokenMap,'.')
+  let statesCount = []
+  let consumedIndex = []
+  
+  // console.log(' *** FUNCTION ***')
+  // console.log('spr,br ',spr,br)
+  // console.log('springsSplit is ',springsSplit)
+  // console.log('brokenMap is ',brokenMap)
+  // console.log('wriggle',wriggle)
+  // console.log(' STATES ')
+  // console.log(states)
+  // console.log(' ')
+
+  springsSplit.forEach((spring,spridx) =>{
+    // console.log('spring is ',spring)
+    // console.log('spridx is ',spridx)
+    let consumedSet =false
+    if (spridx === 0) {
+
+      if (spring === '#') {
+        statesCount.push({1:1})
+        consumedIndex.push(1)
+      } else if (spring === '.') {
+        statesCount.push({0:1})
+      } else {
+        statesCount.push({0:1,1:1})
+      }
+
+    } else if (spridx > 0 && spridx < springsSplit.length) {
+      let nextObj={}
+      for([idx,val]of Object.entries(statesCount[spridx-1])){
+          //console.log('idx,val is ',idx,val)
+        //let statemin = (springsSplit.length-1) - (brokemin-idx)
+
+        let idxNum = parseInt(idx)
+        let lastState = states[idxNum]
+        let nextState = states[idxNum+1]
+        let wriggleIndex = idxNum+wriggle
+        let nextVal = val
+        // console.log('last state ',lastState)
+        // console.log('next state ',nextState)
+        // console.log('wriggleIndex is ',wriggleIndex)
+        let nextStateVal
+
+        if (statesCount[spridx-1][idxNum+1] === undefined) {
+          nextStateVal=0
+        } else {
+          nextStateVal=statesCount[spridx-1][idxNum+1]
+        }
+
+
+        //idxNum === 0 ? nextVal = 1 : nextVal = val
+        if (spridx<=wriggleIndex && (consumedIndex.length === 0||idxNum>=(consumedIndex.at(-1)))) {
+          //console.log('first if block - spridx<wriggleindex or consumedindex check')
+  
+          if (idxNum < states.length-2) {
+            if (nextState === '#' && spring !== '.') {
+              if(idxNum === states.length-3) {
+                if (!spr.substring(spridx+1).includes('#')) {
+                  nextObj[idxNum+1] = nextVal
+                }
+              } else {
+                nextObj[idxNum+1] = nextVal
+              }
+            
+            }
+            
+            if (nextState === '.' && spring !== '#') {
+              nextObj[idxNum+1] = nextVal+nextStateVal
+            }
+  
+            if (lastState === '.' && spring !== '#' && statesCount[spridx-1][idxNum-1] === undefined) {
+              nextObj[idxNum] = nextVal
+            }
+          }
+
+
+        }
+        if (idxNum === states.length-2) {
+           //console.log('in first end state block last #')
+           //console.log(!springsSplit.join('').substring(spridx+1).includes('#') && spring !== '#')
+          if(!springsSplit.join('').substring(spridx+1).includes('#') && spring !== '#') {
+            nextObj[idxNum+1] = nextVal+nextStateVal
+          }
+
+        }
+
+        if (idxNum === states.length-1 && statesCount[spridx-1][idxNum-1] === undefined) {
+          nextObj[idxNum] = val
+        }
+
+        if (spring === '#' && consumedSet===false) {
+          let earliestSpring = Object.keys(nextObj).find((x)=> states[parseInt(x)] === '#')
+          //console.log('earliest Spring is - states are # ',earliestSpring)
+          
+          if(earliestSpring !== undefined){
+            if (states[(parseInt(earliestSpring)-1)] === '.') {
+              consumedIndex.push(parseInt(earliestSpring))
+              consumedSet=true
+              //console.log('*** if block = consumed index updated ***')
+            }
+
+            //earliestSpring = earliestSpring.find((y)=> states[(parseInt(y)-1)] === '.')
+            //  console.log('find correct earliest spring ',earliestSpring)
+            // if (earliestSpring !== undefined) {
+            //   consumedIndex.push(parseInt(earliestSpring))
+            //   consumedSet=true
+            //    console.log('*** consumed index updated ***')
+            //    //console.log(consumedIndex)
+            // }
+
+          }
+
+
+
+
+        }
+
+        
+
+        //console.log(idx,val)
+      }
+      if (spridx<wriggle && spring !== '#' && consumedIndex.length === 0) {
+        nextObj[0] = 1
+    }
+       
+      statesCount.push(nextObj)
+      // console.log('nextObj is ',nextObj)
+      // console.log('statesCount is')
+      // console.log(statesCount)
+      // console.log('consumed index is')
+      // console.log(consumedIndex)
+      // console.log('*** END ***')
+    } else {
+
+    }
+  })
+
+  //console.log(statesCount)
+
+  let lastObj = statesCount.at(-1)
+  
+  let secondLastState = lastObj[states.length-2] === undefined ? 0 : lastObj[states.length-2]
+  let lastState = lastObj[states.length-1] === undefined ? 0 : lastObj[states.length-1]
+
+
+
+  // console.log('secondLastState',secondLastState)
+  // console.log('Last state', lastState)
+
+  return secondLastState+lastState
+}
+let p1sum = 0
+let p2sum = 0
+
+lines.forEach(([springs,broken])=> {
+  //console.log(springs,' ',broken)
+  let p1arrangements = getArrangements(springs,broken,'p1')
+  let p2arrangements = getArrangements(springs,broken,'p2')
+  p1sum += p1arrangements
+  p2sum += p2arrangements
+  //console.log('arrangements ',arrangements, ' and sum is now ',sum)
+})
+console.log(p1sum)
+console.log(p2sum)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+lines.forEach(([springs,broken])=> {
+  console.log(springs,' ',broken)
+  let brokenLen = broken.length
+  let springsLen = springs.length
+  let firstBroken = broken[0]
+  let lastBroken = broken.slice(-1)
+  let forCache = []
+  let arrangements
+
+  forCache.push([springs,broken].join('_'))
+
+// trim last char (?<=[#][#?]{2})([?]$)
+// trim first char (^[?])(?=[#?]{2}[#])
+  // console.log(' ')
+   //console.log('*** NEW LINE ***')
+   //console.log('springs ',springs,' ',broken)
+  let trimRegex = new RegExp(`(^[?])(?=[#?]{${firstBroken-1}}[#])|(?<=[#][#?]{${lastBroken-1}})([?]$)`,'gm')
+
+  // let removeFirstRegex = new RegExp(`(?<=^)([#][#?]{${firstBroken-1}}[.?])|(?=^[?][?#]{${firstBroken-1}}[.])([?]+[#]+[?]*[.])`,'m')
+
+  let removeFirstRegex = new RegExp(`(?<=^)([#][#?]{${firstBroken-1}}[.?])|(?<=^[?#]{${firstBroken-1}})([#][.])|(?=^[?#]+[.])([#]{${firstBroken}}[.])`,'m')
+
+  // let removeLastRegex = new RegExp(`([^#][#?]{${lastBroken-1}}[#]$)|([.]+[?]*[#]+[?]*)(?<=[.][?#]{${lastBroken}}$)`,'m')
+
+  let removeLastRegex = new RegExp(`([^#][#?]{${lastBroken-1}}[#]$)`,'m')
+
+//  do {
+//     springs = springs.replaceAll(trimRegex,'')
+//     let trimLength = springs.length
+//     //console.log('trim is ',springs,' ',broken)
+  
+//     springs = springs.replace(removeFirstRegex,'')
+//     springs.length < trimLength ? broken.shift() : ''
+//     let firstLength = springs.length
+//     //console.log('removeF ',springs,' ',broken)
+  
+//     springs = springs.replace(removeLastRegex,'')
+//     springs.length < firstLength ? broken.pop() : ''
+//     //console.log('removeL ',springs,' ',broken)
+
+//     firstBroken = broken[0]
+//     lastBroken = broken.slice(-1)
+//     trimRegex = new RegExp(`((?<=^)[.]*)([?]{0,${firstBroken-1>0?firstBroken-1:0}}[.]+)|([.]+[?]{0,${lastBroken-1>0?lastBroken-1:0}})([.]*(?=$))|(^[?])(?=[#?]{${firstBroken-1}}[#])|(?<=[#][#?]{${lastBroken-1}})([?]$)`,'gm')
+
+//     removeFirstRegex = new RegExp(`(?<=^)([#][#?]{${firstBroken-1}}[.?])|(?<=^[?#]{${firstBroken-1}})([#][.])`,'m')
+
+
+  
+//     removeLastRegex = new RegExp(`([^#][#?]{${lastBroken-1}}[#]$)`,'m')
+//   } while(!!trimRegex.test(springs) || !!removeFirstRegex.test(springs) || !!removeLastRegex.test(springs))
+
+
+
+  if (broken.length === 0) {
+    sum++
+    //console.log('only one match - no broken left')
+  } else {
+    let brokenMin = broken.reduce((acc,curr)=> acc+curr)+(broken.length-1)
+    //console.log('brokemin is ',brokenMin, 'string length is ',springs.length)
+    if (springs.length === brokenMin) {
+      sum++
+      //console.log('only one match - no wriggle room')
+    } else {
+      if (broken.length === 1 && springs.length-brokenMin<broken[0]) {
+        //console.log('only one broken, ',springs.length-brokenMin+1,' combinations')
+      }
+      //console.log('*** FUNCTION ***')
+
+      let springSplitCheck = springs.split('.')
+      let checkRegex = /(^#|#$)/m
+
+      if (springSplitCheck.length === broken.length && springSplitCheck.every((x)=>checkRegex.test(springs) === true)) {
+        console.log('all groups have broken, ',springs,broken)
+        sum++
+      } else if (broken.length === 1 && broken[0] === 1 && springs.includes('#')) {
+        console.log('only 1 broken, ',springs,broken)
+        sum++
+      } else {
+        arrangements = getArrangements(springs,broken)
+
+
+        sum += arrangements
+        //console.log('arrangements ',arrangements, ' and sum is now ',sum)
+      }
+
+    }
+
+
+  }
+  console.log('arrangements ',arrangements, ' and sum is now ',sum)
+})
+
+console.log(sum)
+
+// Adopted from https://github.com/maneatingape/advent-of-code-rust/blob/main/src/year2023/day12.rs
+
+??????#?
+#.##.##.
+#.##..##
+#..##.##
+.#.##.##
+
+let spr = '??????#?'
+
+     
+let broke = [ 1, 2, 2 ]
+
+let sprlen = 8
+let brmin = 7
+
+let sprArr = spr.split('').concat('.')
+let startArr = spr.slice(0,2)
+let rest = spr.slice(2,3).split('')
+console.log(startArr,rest)
+let checkrow = Array(sprArr.length).fill(0)
+
+console.log(sprArr, checkrow)
+
+let checkArr = [sprArr]
+
+console.log(checkArr)
+
+broke.forEach((br)=> {
+  let iterations = sprlen-brmin+1
+  let startArr = spr.slice(0,2)
+  let rest = spr.slice(2,3).split('')
+  let thisRow = checkrow.slice(0)
+  let groupRegex =  new RegExp(`([#?]{${br}}[?.])`,'m')
+  
+})
+
+console.log(firstBroken,lastBroken)
+
 const hashregex=/([#]+)/g
 const lineSplitRegex=/([^.]+)/g
 
@@ -527,15 +880,3 @@ let testpartitions = partition(sparechars).map((x)=>{
 
 console.log(Array.from(new Set([...permute(testpartitions)].map(JSON.stringify)), JSON.parse))
 
-
-
-let brokenarrtest = [ 6, 1, 1 ]
-console.log(brokenarrtest.flatMap((x)=> [`([?#]{${x}})`,`([?.]+)`]).slice(0,-1).join(''))
-
-  // let regex = ''
-  // // Generate regex string to trim dots from start/end
-  // for (i=0;i<broken.length;i++) {
-  //   i<broken.length-1 ? regex+=`([?#]{${broken[i]}})([?.])+` : regex+= `([?#]{${broken[i]}})`
-  // }
-  // let brokenregex = new RegExp(regex,"g")
-  // let springs = line[0].match(brokenregex).join('').split('.').filter((x)=> x.length>0) // split on dots since they don't add to combos count

@@ -23,6 +23,8 @@ let minHeatLoss = 100000000
 let adjacencyList = {}
 let listQueue = [[startx,starty]]
 
+// Approach inspired by https://github.com/hiimjustin000/advent-of-code/blob/master/2023/day17/part1.js
+
 while (!!listQueue.length) {
   var [r,c] = listQueue.shift()
   if (adjacencyList[`${r}-${c}`] === undefined) {
@@ -288,7 +290,7 @@ while(p2pqueue.findIndex((x)=> x.length>0) !== -1) {
         
         //console.log('added to pqueue ',nextItem)
       } else {
-        console.log('end was reached on iteration ',p2piterations,' pathHeatLoss is ',updatedDistance)
+        console.log('p2 end was reached on iteration ',p2piterations,' pathHeatLoss is ',updatedDistance)
         //break;
       }
     }
@@ -299,4 +301,4 @@ while(p2pqueue.findIndex((x)=> x.length>0) !== -1) {
   // console.log(shortestMap)
 
 }
-console.log(p2shortestMap)
+console.log(p2piterations)
