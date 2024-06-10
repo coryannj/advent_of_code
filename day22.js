@@ -2,6 +2,7 @@ const fs = require('fs');
 const { only } = require('node:test');
 const input = fs.readFileSync('../day22input.txt',{ encoding: 'utf8', flag: 'r' });
 
+// Solution based on https://www.youtube.com/watch?v=imz7uexX394
 const lines = input.split(/[\r\n]+/)
 .map((y)=> y.replace('~',',').split(',').map(Number))
 .sort((a,b)=> a[2]-b[2])
