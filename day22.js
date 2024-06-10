@@ -4,32 +4,27 @@ const input = fs.readFileSync('../day22input.txt',{ encoding: 'utf8', flag: 'r' 
 
 const lines = input.split(/[\r\n]+/)
 .map((y)=> y.replace('~',',').split(',').map(Number))
-.map((z,zidx)=> [zidx,[z[0],z[3]],[z[1],z[4]],[z[2],z[5]]])
-.sort((a,b)=> a[3][0]-b[3][0])
-.map(([a,b,c,d],idx)=>[idx,b,c,d])
+.sort((a,b)=> a[2]-b[2])
+.map((z,zidx)=> [zidx,[z[0],z[3]],[z[1],z[4]],[z[2],z[5]]]); // to use index as key
 
-let bricks = lines.length
-let supporting = new Map()
-let supportedBy = new Map()
+const bricks = lines.length;
 
-for(a=0;a<bricks;a++) {
-  supporting.set(a,[])
-  supportedBy.set(a,[])
-}
-
-let seen = []
-seen.push(lines[0])
+// Populate supporting and supported maps with empty arrays for each indice
+let kvArr = Array.from({ length: bricks }, (_, i) => [i,[]]);
+let supporting = new Map(JSON.parse(JSON.stringify(kvArr)));
+let supportedBy = new Map(JSON.parse(JSON.stringify(kvArr)));
 
 // Drop all the bricks
+let seen = []
+seen.push(lines[0])
 for(a=1;a<bricks;a++) {
-  let [aidx,[ax1,ax2],[ay1,ay2],[az1,az2]] = lines[a]
-  let lastSupport = seen.findLast(([sidx,[x1,x2],[y1,y2],[z1,z2]])=> Math.max(ax1,x1)<=Math.min(ax2,x2) && Math.max(ay1,y1)<=Math.min(ay2,y2))
+  let [aidx,[ax1,ax2],[ay1,ay2],[az1,az2]] = lines[a];
+  let lastSupport = seen.findLast(([sidx,[x1,x2],[y1,y2],[z1,z2]])=> Math.max(ax1,x1)<=Math.min(ax2,x2) && Math.max(ay1,y1)<=Math.min(ay2,y2));
 
   if (lastSupport !== undefined) {
-    seen.push([aidx,[ax1,ax2],[ay1,ay2],[lastSupport[3][1]+1,lastSupport[3][1]+1+(az2-az1)]])
-
+    seen.push([aidx,[ax1,ax2],[ay1,ay2],[lastSupport[3][1]+1,lastSupport[3][1]+1+(az2-az1)]]);
   } else {
-    seen.push([aidx,[ax1,ax2],[ay1,ay2],[1,1+(az2-az1)]])
+    seen.push([aidx,[ax1,ax2],[ay1,ay2],[1,1+(az2-az1)]]);
   }
   seen.sort((a,b)=>a[3][1]-b[3][1])
 }
@@ -49,38 +44,26 @@ for(b=0;b<seen.length-1;b++){
 // console.log(supportedBy)
 
 // Part 1
-let canRemove = 0
-let canRemoveSeen = new Set()
+let canRemove = 0;
+let canRemoveSeen = new Set();
 
 // Find which bricks are supported by more than one brick && which of those bricks isn't supporting others, or all supporting has multi supports
-let manySupports = [...supportedBy.keys()].filter((x)=> supportedBy.get(x).length > 1)
+let manySupports = [...supportedBy.keys()].filter((x)=> supportedBy.get(x).length > 1);
 
 manySupports.forEach((supportedBrick)=>{
-  let supports = supportedBy.get(supportedBrick)
+  let supports = supportedBy.get(supportedBrick);
 
   supports.forEach((supporter)=>{
-    if(!canRemoveSeen.has(supporter)){
-      if (supporting.get(supporter).length === 1){
-        //console.log('--TRUE - only supporting one brick')
-        canRemove++
-        canRemoveSeen.add(supporter)
-      } else {
-        let otherSupporting = [...supporting.get(supporter)].filter((x)=> x !== supportedBrick)
-
-        if (otherSupporting.every((x)=>supportedBy.get(x).length>1)){
-          //console.log('--TRUE - every supporting has other support')
-          canRemove++
-          canRemoveSeen.add(supporter)
-        }
-      }
-    } 
-    
+      if (!canRemoveSeen.has(supporter) && (supporting.get(supporter).length === 1 || [...supporting.get(supporter)].every((x)=>supportedBy.get(x).length>1))){
+        canRemove++;
+        canRemoveSeen.add(supporter);
+      }     
   })
 })
 
 // Add bricks which are not supporting anything
-let noSupporting = [...supporting.keys()].filter((x)=> supporting.get(x).length === 0);
-canRemove+=noSupporting.length;
+canRemove+=[...supporting.keys()].filter((x)=> supporting.get(x).length === 0).length;
+
 console.log(canRemove) // Part 1 answer
 
 // Part 2
