@@ -79,21 +79,15 @@ function getNext(nextArr,dir,steps,p1orp2,HTorTT){
     }
 }
 
-// Part 1
-lines.forEach(([direction,steps])=> {
-    for(i=0;i<steps;i++){
-        let nextStep = getNext(p1next,direction,steps,'p1')
-        p1next = nextStep
-    }
-})
-console.log(p1Seen.size) // Part 1 answer
-
-// Part 2
 lines.forEach(([direction,steps])=> {
     
     for(j=0;j<steps;j++){
+        let nextStep = getNext(p1next,direction,steps,'p1')
+        p1next = nextStep
+
         let p2nextArr = getNext(p2next,direction,steps,'p2')
         p2next = p2nextArr
     }
 })
-console.log(p2Seen.size) // Part 1 answer
+console.log(p1Seen.size) // Part 1 answer
+console.log(p2Seen.size) // Part 2 answer
