@@ -82,8 +82,8 @@ function getNext(nextArr,dir,steps,p1orp2,HTorTT){
 lines.forEach(([direction,steps])=> {
     
     for(j=0;j<steps;j++){
-        let nextStep = getNext(p1next,direction,steps,'p1')
-        p1next = nextStep
+        let p1nextArr = getNext(p1next,direction,steps,'p1')
+        p1next = p1nextArr
 
         let p2nextArr = getNext(p2next,direction,steps,'p2')
         p2next = p2nextArr
