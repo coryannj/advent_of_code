@@ -1,82 +1,125 @@
 const fs = require('fs');
-const input = fs.readFileSync('../day13input.txt',{ encoding: 'utf8', flag: 'r' });
+const input = fs.readFileSync('../day16input.txt',{ encoding: 'utf8' });
+const parseRegex = /([A-Z]{2}|\d+)/g
+const lines = input.split(/[\r\n]+/).map((y)=>y.match(parseRegex))
 
-const lines = input.split(/\n\n/).map((x)=> x.split(/[\r\n]+/).map((y)=>JSON.parse(y)))
+let tunnelMap = {}
+let valveMap = {}
+let newMap = {}
 
-function compare(left,right) {
-    if (typeof left === 'number' && typeof right === 'number') {
-        if(left>right){
-            return -1
-        } else if (right>left){
-            return 1
-        } else {
-            return 0
-        }
-    } else if ((typeof left === 'array'|| typeof left === 'object') && (typeof right === 'array'||typeof right === 'object')) {        
-        if (left.length>0 && right.length === 0) {
-            return -1
-        } else if (left.length === 0 && right.length > 0) {
-            return 1
-        } else if (left.length === 0 && right.length === 0) {
-            return 0
-        } else {
-            return compareAll(left,right)
-        }
-
-    } else {
-        if (left === undefined || right === undefined){
-            if (left !== undefined) {
-                return -1
-            } else {
-                return 1
-            }
-        } else { // One is array and one is a number
-            if (typeof left === 'number') {
-                return compareAll([left],right)
-            } else {
-                return compareAll(left,[right])
-            }
-        }
-    }
-}
-
-function compareAll(leftarr,rightarr){
-    let result = 0;
-
-    let leftmap = JSON.parse(JSON.stringify(leftarr));
-    let rightmap = JSON.parse(JSON.stringify(rightarr));
-
-    while (leftmap.length > 0 || rightmap.length > 0){
-        result = compare(leftmap.shift(),rightmap.shift())
-        if (result !== 0){
-            break;
-        }
-    }
-    return result
-}
-
-// Part 1
-let indices = []
-
-let p1lines = JSON.parse(JSON.stringify(lines))
-
-p1lines.forEach(([lineleft,lineright],lineidx)=>{
-    if(compare(lineleft,lineright) !== -1){
-        indices.push(lineidx+1)
-    }
+lines.forEach((line,idx)=>{
+    valveMap[line[0]]=parseInt(line[1])
+    let tunnels = line.slice(2)
+    tunnelMap[line[0]] = tunnels
 })
 
-console.log(indices.reduce((acc,curr)=> acc+curr)) //Part 1 answer
+// All pairs shortest paths - add 1 to dist as we're going to turn every valve on
+let shortMap = {}
 
-// Part 2
-let p2lines = input.split(/[\r\n]+/).map((y)=>JSON.parse(y))
+function shortestAll(startNode){
+    let sQueue = [[0,startNode]]
+    let qseen = []
+    qseen.push(startNode)
+    
+    while(sQueue.length>0){
+        let last = sQueue.shift()
+        let nextTunnels = tunnelMap[last.at(-1)].filter((x)=> !qseen.includes(x))
+        last[0]++
+        nextTunnels.forEach((nextT)=>{
+                
+                if(valveMap[nextT] !== 0){
+                    if (shortMap[last.at(1)]===undefined){
+                        shortMap[last.at(1)] = {} 
+                    }
+                    if(shortMap[last.at(1)][nextT] === undefined){
+                        shortMap[last.at(1)][nextT]=[last[0]+1,valveMap[nextT]]
+                    }
+                    
+                } 
+                sQueue.push(last.concat(nextT))
+                qseen.push(nextT)
+            
+        })
+    }
+}
 
-p2lines.push([[2]])
-p2lines.push([[6]])
+Object.keys(valveMap).filter((x)=>valveMap[x]>0||x==='AA').forEach((valve)=>shortestAll(valve))
 
-p2lines.sort((a,b)=>compare(b,a))
 
-let firstindex = p2lines.findIndex((x)=>JSON.stringify(x)=== JSON.stringify([[2]]))
-let secondindex = p2lines.findIndex((x)=>JSON.stringify(x)=== JSON.stringify([[6]]))
+function getPaths(startNode,maxTime,minLen,maxLen,allormax){
+    let pqueue = [[0,0,startNode]]
+    let paths = []
+    let maxFlow = 1000 // Don't return paths below this
+    let counter = 0
 
-console.log((firstindex+1)*(secondindex+1)) // Part 2 answer
+    while(pqueue.length>0){
+        counter++
+        let [time,flow,valves] = pqueue.shift()
+        let lastValve = valves.at(-1)
+
+        let nextTunnels = Object.entries(shortMap[lastValve]).filter(([nextKey,[nextDist,nextFlow]])=> !valves.includes(nextKey) && (time+nextDist)<=maxTime)
+
+        if (nextTunnels.length === 0){
+            if(valves.length>=minLen && valves.length<=maxLen){
+                if(allormax === 'max'){
+                    if(flow>=maxFlow){
+                        //maxFlow = flow
+                        paths.push([time,flow,valves])
+                        //console.log('new max found on iteration - no nextTunnels',counter,[time,flow,valves])
+                    }
+                } else {
+                    paths.push([time,flow,valves])
+                }
+
+            }
+        } else {
+            nextTunnels.forEach(([nextKey,[nextDist,nextFlow]])=>{
+                let nextTime = time + nextDist
+                let timeRemaining = maxTime-nextTime
+                let addFlow = flow + (timeRemaining*nextFlow)
+
+                if(valves.length<maxLen-1){
+                    if(valves.length>=minLen){
+                        if(allormax === 'max'){
+                            if(addFlow>=maxFlow){
+                                //maxFlow = addFlow
+                                paths.push([nextTime,addFlow,valves.concat(nextKey)])
+                                //console.log('new max found on iteration - above minLen',counter,[nextTime,addFlow,valves.concat(nextKey)])
+                            }
+                        } else {
+                            paths.push([nextTime,addFlow,valves.concat(nextKey)])
+                        }
+
+                    }
+                    pqueue.push([nextTime,addFlow,valves.concat(nextKey)])
+                } else {
+                    if(allormax === 'max'){
+                        if(addFlow>=maxFlow){
+                            //maxFlow = addFlow
+                            paths.push([nextTime,addFlow,valves.concat(nextKey)])
+                            //console.log('new max found on iteration - reached maxLen',counter,[nextTime,addFlow,valves.concat(nextKey)])
+                        }
+                    } else {
+                        paths.push([nextTime,addFlow,valves.concat(nextKey)])
+                    }
+
+                    
+                }
+
+
+            })
+        }
+    }
+    return paths
+}
+
+console.log('*** Part 1 ***')
+console.log([...getPaths(['AA'],30,7,8,'max')].map((x)=>x[1]).sort((a,b)=>b-a).at(0))
+
+console.log('*** Part 2 ***')
+console.log([...getPaths(['AA'],26,7,8,'max')].sort((a,b)=>b[1]-a[1]).map((path,ind,arr)=>{
+    let disjoint = arr.find((dpath,ix)=> ix !== ind && dpath[2].slice(1).every((key)=> !path[2].includes(key)))
+    //console.log('[time,flow,keys]',path)
+    //console.log('disjoint is ',disjoint)
+    return disjoint === undefined ? path[1] : path[1]+disjoint[1]
+}).sort((a,b)=>b-a).at(0))
