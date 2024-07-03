@@ -5,9 +5,8 @@ const lines = input.split(/[\r\n]+/).map((y)=>y.match(parseRegex))
 
 let tunnelMap = {}
 let valveMap = {}
-let newMap = {}
 
-lines.forEach((line,idx)=>{
+lines.forEach((line)=>{
     valveMap[line[0]]=parseInt(line[1])
     let tunnels = line.slice(2)
     tunnelMap[line[0]] = tunnels
@@ -45,11 +44,10 @@ function shortestAll(startNode){
 
 Object.keys(valveMap).filter((x)=>valveMap[x]>0||x==='AA').forEach((valve)=>shortestAll(valve))
 
-
 function getPaths(startNode,maxTime,minLen,maxLen,allormax){
     let pqueue = [[0,0,startNode]]
     let paths = []
-    let maxFlow = 1000 // Don't return paths below this
+    let maxFlow = 1000 // Don't return paths with total flow below this
     let counter = 0
 
     while(pqueue.length>0){
@@ -102,24 +100,18 @@ function getPaths(startNode,maxTime,minLen,maxLen,allormax){
                     } else {
                         paths.push([nextTime,addFlow,valves.concat(nextKey)])
                     }
-
-                    
                 }
-
-
             })
         }
     }
-    return paths
+    return paths.sort((a,b)=>b[1]-a[1])
 }
 
 console.log('*** Part 1 ***')
-console.log([...getPaths(['AA'],30,7,8,'max')].map((x)=>x[1]).sort((a,b)=>b-a).at(0))
+console.log([...getPaths(['AA'],30,7,8,'max')].map((x)=>x[1]).at(0))
 
 console.log('*** Part 2 ***')
-console.log([...getPaths(['AA'],26,7,8,'max')].sort((a,b)=>b[1]-a[1]).map((path,ind,arr)=>{
+console.log([...getPaths(['AA'],26,7,8,'max')].map((path,ind,arr)=>{
     let disjoint = arr.find((dpath,ix)=> ix !== ind && dpath[2].slice(1).every((key)=> !path[2].includes(key)))
-    //console.log('[time,flow,keys]',path)
-    //console.log('disjoint is ',disjoint)
     return disjoint === undefined ? path[1] : path[1]+disjoint[1]
 }).sort((a,b)=>b-a).at(0))
