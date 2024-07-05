@@ -1,13 +1,14 @@
 const fs = require('fs');
 const input = fs.readFileSync('../day17input.txt',{ encoding: 'utf8' });
-const parseRegex = /([A-Z]{2}|\d+)/g
-let jets = input.split('').map((x)=> x === '<'?-1:1)
-console.log(jets)
 
-let nextRow = 0
-let nextRock = 5
-let endRock = 2021+nextRock
-let seen = ['0-0','0-1','0-2','0-3','0-4','0-5','0-6']
+let jets = input.split('').map((x)=> x === '<'?-1:1)
+let jetsIndex = jets.map((x,ix)=>ix)
+let seen
+let cycleKeys = []
+let cycleInfo = []
+let completeCycles = []
+let completeCycleInfo = []
+let firstCycle = {}
 
 function getRock(rockNumber,rowNumber){
     let rocks = new Map()
@@ -24,11 +25,13 @@ function moveRock(rock,directionToggle){
     let nextPosition = rock
     if(directionToggle%2 === 0){ // move left/right
         let nextDir = jets.shift()
+        let nextJetInd = jetsIndex.shift()
         
         if (rock.every(([r,c])=> 0<=c+nextDir && c+nextDir<=6 && !seen.includes(`${r}-${c+nextDir}`))){
             nextPosition = rock.map(([r,c])=>[r,c+nextDir])
         } 
         jets.push(nextDir)
+        jetsIndex.push(nextJetInd)
 
     } else { // move down
         nextPosition = rock.map(([r,c])=>[r-1,c])
@@ -36,42 +39,119 @@ function moveRock(rock,directionToggle){
     return nextPosition
 }
 
-function dropRock(rock){
+function dropRock(rock,rockNo,height){
     let direction = 0
     let position = rock
-    //console.log('start position is ',position,' start direction is ',direction)
-
+    let jetSeen = []
+    
     do{
+        if(direction%2 === 0){
+            jetSeen.push(jetsIndex[0])
+        }
         nextMove = moveRock(position,direction)
-        
         position = nextMove
         direction++
-        //console.log('nextMove is now ',position,'direction is now ',direction)
-    }while((direction%2 === 1 && !position.some(([r,c])=> seen.includes(`${r-1}-${c}`)))||direction%2 === 0)
+    } while((direction%2 === 1 && !position.some(([r,c])=> seen.includes(`${r-1}-${c}`)))||direction%2 === 0)
+    
+    let heightChange
+    let newHeight
+    
+    if(position.at(-1)[0]>height){
+        heightChange = position.at(-1)[0]-height
+        newHeight = position.at(-1)[0]
+    } else {
+        heightChange = 0
+        newHeight = height
+    }
+
+    cycleKeys.push(`${rockNo%5}_${jetSeen.join('_')}_${heightChange}`)
+    cycleInfo.push([rockNo+1,newHeight,heightChange])
+
+    if(rockNo%5 === 4){ // Store every 5 rock lines to check for cycles
+        if(completeCycles.lastIndexOf(cycleKeys.join('|')) !== -1){
+            let cycleFound = completeCycles.lastIndexOf(cycleKeys.join('|'))
+
+            if(firstCycle['firstCycleKey'] === undefined){
+                firstCycle['beforeFirstCycleKey'] = completeCycles[cycleFound-1].split('|')
+                firstCycle['beforeFirstCycleInfo'] = completeCycleInfo[cycleFound-1]
+                firstCycle['firstCycleKey'] = completeCycles[cycleFound].split('|')
+                firstCycle['firstCycleInfo'] = completeCycleInfo[cycleFound]
+                firstCycle['beforeCurrentCycleKey'] = completeCycles.at(-1).split('|')
+                firstCycle['beforeCurrentCycleInfo'] = completeCycleInfo.at(-1)
+                firstCycle['currentCycleKey'] = cycleKeys
+                firstCycle['currentCycleInfo'] = cycleInfo.slice(0)
+            }
+
+            completeCycles.push(cycleKeys.join('|'))
+            completeCycleInfo.push(cycleInfo)
+            cycleKeys = []
+            cycleInfo = []
+
+        } else {
+            completeCycles.push(cycleKeys.join('|'))
+            completeCycleInfo.push(cycleInfo)
+            cycleKeys = []
+            cycleInfo = []
+        }
+
+        
+    }
+
     return position
 }
 
-//console.log('nextRock,nextRow',nextRock,nextRow)
-let droppedRock
+function getHeight(numberOfRocks){
+    jets = input.split('').map((x)=> x === '<'?-1:1)
+    jetsIndex = jets.map((x,ix)=>ix)
+    seen = ['0-0','0-1','0-2','0-3','0-4','0-5','0-6']
+    let nextRow = 0
+    let nextRock = 0
+    let endRock = numberOfRocks-1
+    let droppedRock
 
-do {
-    let thisRock = getRock(nextRock%5,nextRow)
-
-    droppedRock = dropRock(thisRock)
-    droppedRock.forEach(([r,c])=>seen.push(`${r}-${c}`))
-    nextRock++
-    if(droppedRock.at(-1)[0]>nextRow){
-        nextRow = droppedRock.at(-1)[0]
+    while (nextRock<=endRock) {
+        let thisRock = getRock(nextRock%5,nextRow)
+        droppedRock = dropRock(thisRock,nextRock,nextRow)
+        droppedRock.forEach(([r,c])=>seen.push(`${r}-${c}`))
+        nextRock++
+        if(droppedRock.at(-1)[0]>nextRow){
+            nextRow = droppedRock.at(-1)[0]
+        }    
     }
 
-//console.log('droppedRock is ',droppedRock)
-//console.log('nextRock,nextRow',nextRock,nextRow)
+    return nextRow 
+}
 
-
-} while (nextRock<=endRock)
-
-console.log(nextRow) // Part 1 answer
+console.log(getHeight(2022)) // Part 1 answer
 
 //Part 2
-jets = input.split('').map((x)=> x === '<'?-1:1)
-console.log(jets)
+
+let offsetIndex
+
+for(i=0;i<5;i++){ // Check if cycle started before first 5 rows detected
+    let beforeFirstFiveKeys = firstCycle['beforeFirstCycleKey'].slice(i)
+    let beforeFirstFiveInfo = firstCycle['beforeFirstCycleInfo'].slice(i)
+    let beforeEndFiveKeys = firstCycle['beforeCurrentCycleKey'].slice(i)
+    let beforeEndFiveInfo = firstCycle['beforeCurrentCycleInfo'].slice(i)
+
+    if(beforeFirstFiveKeys.every((x,ix,arr)=> arr[ix] === beforeEndFiveKeys[ix]) && beforeFirstFiveInfo.every((y,yix,arr)=>arr[yix][2]===beforeEndFiveInfo[yix][2])){
+        offsetIndex = i
+        break;
+    }
+}
+
+let [offsetRockNo,offsetRockHeight,offsetHeightIncrease] = offsetIndex !== undefined ? firstCycle['beforeFirstCycleInfo'][offsetIndex-1] : firstCycle['beforeFirstCycleInfo'][4]
+
+let [startRockNo,startRockHeight,startHeightIncrease] = offsetIndex !== undefined ?firstCycle['beforeFirstCycleInfo'][offsetIndex] : firstCycle['firstCycleInfo'][0]
+
+let [endRockNo,endRockHeight,endHeightIncrease] = offsetIndex !== undefined ? firstCycle['beforeCurrentCycleInfo'][offsetIndex] : firstCycle['currentCycleInfo'][0]
+
+let cycleLength = endRockNo-startRockNo
+let cycleHeight = endRockHeight-startRockHeight
+
+let p2Rocks = 1000000000000-1
+let numOfCycles = Math.floor((p2Rocks-offsetRockNo)/cycleLength)
+let remainderRocks = p2Rocks - offsetRockNo - (numOfCycles*cycleLength)
+
+let totalHeight = (cycleHeight*numOfCycles) + getHeight(startRockNo+remainderRocks)
+console.log(totalHeight) // Part 2 answer
