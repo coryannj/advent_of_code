@@ -67,11 +67,11 @@ function dropRock(rock,rockNo,height){
     cycleKeys.push(`${rockNo%5}_${jetSeen.join('_')}_${heightChange}`)
     cycleInfo.push([rockNo+1,newHeight,heightChange])
 
-    if(rockNo%5 === 4){ // Store every 5 rock lines to check for cycles
+    if(rockNo%5 === 4 && firstCycle['firstCycleKey'] === undefined){ // Store every 5 rock lines to check for cycles
         if(completeCycles.lastIndexOf(cycleKeys.join('|')) !== -1){
             let cycleFound = completeCycles.lastIndexOf(cycleKeys.join('|'))
 
-            if(firstCycle['firstCycleKey'] === undefined){
+            //if(firstCycle['firstCycleKey'] === undefined){
                 firstCycle['beforeFirstCycleKey'] = completeCycles[cycleFound-1].split('|')
                 firstCycle['beforeFirstCycleInfo'] = completeCycleInfo[cycleFound-1]
                 firstCycle['firstCycleKey'] = completeCycles[cycleFound].split('|')
@@ -80,7 +80,7 @@ function dropRock(rock,rockNo,height){
                 firstCycle['beforeCurrentCycleInfo'] = completeCycleInfo.at(-1)
                 firstCycle['currentCycleKey'] = cycleKeys
                 firstCycle['currentCycleInfo'] = cycleInfo.slice(0)
-            }
+            //}
 
             completeCycles.push(cycleKeys.join('|'))
             completeCycleInfo.push(cycleInfo)
