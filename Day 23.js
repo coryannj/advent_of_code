@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { takeCoverage } = require('v8');
+
 const input = fs.readFileSync('../day23input.txt',{ encoding: 'utf8' });
 
 let elfList = input.split(/[\r\n]+/).map((x)=>x.split('')).flatMap((x,ix)=>x.map((y,iy)=>y==='#'?[ix,iy]:[])).filter((z)=>z.length>0)
