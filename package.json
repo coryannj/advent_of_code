@@ -1,0 +1,14 @@
+{
+  "name": "advent_of_code_2021",
+  "version": "1.0.0",
+  "description": "advent of code 2021 solutions",
+  "main": "Day 15.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Cory-Ann Joseph",
+  "license": "ISC",
+  "dependencies": {
+    "@datastructures-js/heap": "^4.3.3"
+  }
+}
