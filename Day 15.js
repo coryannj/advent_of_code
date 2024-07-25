@@ -78,18 +78,18 @@ let [p2rowLen,p2colLen] = [grid.length,grid[0].length]
 let [p2endRow,p2endCol] = [p2rowLen-1,p2colLen-1]
 let p2endKey = [p2endRow,p2endCol].join('-')
 
-// let p2queue = Array(3000).fill('.').map((x)=>[])
-// p2queue[0].push(p2start)
+let p2queue = Array(3000).fill('.').map((x)=>[])
+p2queue[0].push(p2start)
 
-const p2queue = new PriorityQueue([],(x,y)=> x[0]-y[0]);
+//const p2queue = new PriorityQueue([],(x,y)=> x[0]-y[0]);
 
-p2queue.push(p2start)
+//p2queue.push(p2start)
 
-while(!p2queue.empty()){
-//while(p2queue.findIndex((x)=>x.length>0) !== -1){
-    let [dist,[r,c]] = p2queue.pop();
+//while(!p2queue.empty()){
+while(p2queue.findIndex((x)=>x.length>0) !== -1){
+    //let [dist,[r,c]] = p2queue.pop();
     //console.log(dist,r,c)
-    //let [dist,[r,c]] = p2queue[p2queue.findIndex((x)=>x.length>0)].shift();
+    let [dist,[r,c]] = p2queue[p2queue.findIndex((x)=>x.length>0)].shift();
 
     let nextArr = [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].filter(([nr,nc])=>0 <= nr && nr < p2rowLen && 0 <= nc && nc < p2colLen && !p2seen.includes(`${nr}-${nc}`) && (p2shortest[`${nr}-${nc}`] === undefined || p2shortest[`${nr}-${nc}`]>dist+grid[nr][nc]));
 
@@ -112,8 +112,8 @@ while(!p2queue.empty()){
         }
 
         if(`${dr}-${dc}` !== p2endKey){
-            p2queue.push([newDist,[dr,dc]])
-            //p2queue[newDist].push([newDist,[dr,dc]])
+            //p2queue.push([newDist,[dr,dc]])
+            p2queue[newDist].push([newDist,[dr,dc]])
         }
     })
     p2seen.push(`${r}-${c}`)
@@ -121,4 +121,4 @@ while(!p2queue.empty()){
 
 }
 
-console.log(p2shortest[`${p2endRow}-${p2endCol}`])
+console.log(p2shortest[`${p2endRow}-${p2endCol}`]) // Part 2 answer
