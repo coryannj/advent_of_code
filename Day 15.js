@@ -1,10 +1,11 @@
 const fs = require('fs');
 const input = fs.readFileSync('../day15input.txt',{ encoding: 'utf8', flag: 'r' });
-const {
-    PriorityQueue,
-    MinPriorityQueue,
-    MaxPriorityQueue,
-  } = require('@datastructures-js/priority-queue');
+// const {
+//     PriorityQueue,
+//     MinPriorityQueue,
+//     MaxPriorityQueue,
+//   } = require('@datastructures-js/priority-queue');
+const {PriorityQueue}=require('@js-sdsl/priority-queue');
 let lines = input.split(/[\r\n]+/).map((x)=>x.split('').map(Number))
 
 // Part 1
@@ -82,11 +83,19 @@ let [p2rowLen,p2colLen] = [grid.length,grid[0].length]
 let [p2endRow,p2endCol] = [p2rowLen-1,p2colLen-1]
 let p2endKey = [p2endRow,p2endCol].join('-')
 
-let p2queue = Array(3000).fill('.').map((x)=>[])
-p2queue[0].push(p2start)
+// let p2queue = Array(3000).fill('.').map((x)=>[])
+// p2queue[0].push(p2start)
 
-while(p2queue.findIndex((x)=>x.length>0) !== -1){
-    let [dist,[r,c]] = p2queue[p2queue.findIndex((x)=>x.length>0)].shift();
+const p2queue = new PriorityQueue(
+  (x,y)=> x[0]-y[0]
+);
+
+p2queue.push(p2start)
+
+while(!p2queue.empty()){
+//while(p2queue.findIndex((x)=>x.length>0) !== -1){
+    let [dist,[r,c]] = p2queue.pop();
+    //let [dist,[r,c]] = p2queue[p2queue.findIndex((x)=>x.length>0)].shift();
 
     let nextArr = [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].filter(([nr,nc])=>0 <= nr && nr < p2rowLen && 0 <= nc && nc < p2colLen && !p2seen.includes(`${nr}-${nc}`) && (p2shortest[`${nr}-${nc}`] === undefined || p2shortest[`${nr}-${nc}`]>dist+grid[nr][nc]));
 
@@ -109,11 +118,12 @@ while(p2queue.findIndex((x)=>x.length>0) !== -1){
         }
 
         if(`${dr}-${dc}` !== p2endKey){
-            p2queue[newDist].push([newDist,[dr,dc]])
+            p2queue.enqueue([newDist,[dr,dc]])
+            //p2queue[newDist].push([newDist,[dr,dc]])
         }
     })
     p2seen.push(`${r}-${c}`)
-   
+    //console.log(p2queue.front());
 
 }
 
