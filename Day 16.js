@@ -20,9 +20,8 @@ let hexToBinary = {
     F : '1111'
 }
 
-let binaryToHex = Object.fromEntries(Object.entries(hexToBinary).map(([k,v])=>[v,k]))
-
-let binArr = input.split('').map((x)=>hexToBinary[x]).join('').split('')
+let binaryToHex = Object.fromEntries(Object.entries(hexToBinary).map(([k,v])=>[v,k]));
+let binArr = input.split('').map((x)=>hexToBinary[x]).join('').split('');
 
 const getPath = (object, path) => {
     if(!path.toString().includes('.')){
@@ -43,9 +42,8 @@ const setPath = (object, path, value) => {
 }
 
 // Part 1
-let packet = {}
-let currPacket = '0'
-let versionCount = 0
+let packet = {};
+let versionCount = 0;
 
 function outerPacket(toBinaryArr,packetKey){
     let version = binaryToHex[`0${toBinaryArr.splice(0,3).join('')}`]
