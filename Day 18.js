@@ -94,6 +94,7 @@ while(p1lines.length>0){
 }
 console.log(magnitude(curr)) // Part 1 answer
 
+// Part 2
 let p2lines = lines.slice()
 let highestMagnitude = 0
 
