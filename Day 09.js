@@ -25,4 +25,4 @@ while(findSum === -1){
 }
 
 let slice = lines.slice(findSum,findSum+size).sort((a,b)=>a-b)
-console.log(slice[0]+slice.at(-1))
+console.log(slice[0]+slice.at(-1)) // Part 2 answer
