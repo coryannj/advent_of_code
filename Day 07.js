@@ -1,17 +1,15 @@
 const fs = require('fs');
 const input = fs.readFileSync('../day7input.txt',{ encoding: 'utf8', flag: 'r' });
 
-let lines = input.replaceAll('.','').split(/[\r\n]+/).map((x)=>x.split(' bags contain ')).map(([k,v])=> [k,v.replaceAll(/\s+bag[s]{0,1}/g,'').split(', ')])
+let lines = input.replaceAll('.','').split(/[\r\n]+/).map((x)=>x.split(' bags contain ')).map(([k,v])=> [k,v.replaceAll(/\s+bag[s]{0,1}/g,'').replaceAll('no','0').split(', ')])
 
 let bagMap = {}
 
 lines.forEach(([k,v])=>{
-    bagMap[k] = {}
-
+    bagMap[k] = {};
     v.forEach((bag)=>{
         let split = bag.split(' ')
-        let noOfBags = split[0] === 'no' ? 0 : parseInt(split[0])
-        bagMap[k][split.slice(1).join(' ')] = noOfBags
+        bagMap[k][split.slice(1).join(' ')] = parseInt(split[0])
     })
 })
 

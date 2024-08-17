@@ -9,57 +9,22 @@ console.log(hasFields.length) // Part 1 answer
 
 function checkPassport(passport){
     let valid = true
-    let toCheck = passport.slice()
+    let toCheck = structuredClone(passport)
 
     while(valid === true && toCheck.length>0){
         let [k,v] = toCheck.shift()
 
-        if(k === 'byr' && (v.length !== 4 || isNaN(parseInt(v))||(parseInt(v)<1920||parseInt(v)>2002))){
-            valid = false
-            continue;
+        let checkValid = {
+            'byr': /^(19[2-9][0-9]|200[0-2])$/m.test(v),
+            'iyr': /^(201[0-9]|2020)$/m.test(v),
+            'eyr': /^(202[0-9]|2030)$/m.test(v),
+            'hgt':/^(1[5-8][0-9]cm|19[0-3]cm|59in|6[0-9]in|7[0-6]in)$/m.test(v),
+            'hcl': /(^[#][0-9a-f]{6}$)/m.test(v),
+            'ecl': /^(amb|blu|brn|gry|grn|hzl|oth)$/m.test(v),
+            'pid': /^([0-9]{9})$/m.test(v),
+            'cid': true
         }
-        if(k === 'iyr' && (v.length !== 4 ||isNaN(parseInt(v))||(parseInt(v)<2010||parseInt(v)>2020))){
-            valid = false
-            continue;
-        }
-        if(k === 'eyr' && (v.length !== 4 ||isNaN(parseInt(v))||(parseInt(v)<2020||parseInt(v)>2030))){
-            valid = false
-            continue;
-        }
-        if(k === 'hgt'){
-
-            if(v.slice(-2) !== 'cm' && v.slice(-2) !== 'in'){
-                valid = false
-                continue;
-            } else {
-                if(v.slice(-2) === 'cm' && (isNaN(parseInt(v.slice(0,-2)))|| parseInt(v.slice(0,-2))<150||parseInt(v.slice(0,-2))>193)){
-                    valid = false
-                    continue;
-                }
-    
-                if(v.slice(-2) === 'in' && (isNaN(parseInt(v.slice(0,-2)))|| parseInt(v.slice(0,-2))<59||parseInt(v.slice(0,-2))>76)){
-                    valid = false
-                    continue;
-                }
-            }
-
-        }
-
-        if(k === 'hcl' && (v.charAt(0) !== '#' || (v.length !== 7 || !v.slice(1).split('').every((x)=> '0123456789abcdef'.includes(x))))){
-            valid = false
-            continue;
-        }
-
-        if(k === 'ecl' && !['amb','blu','brn','gry','grn','hzl','oth'].includes(v)){
-            valid = false
-            continue;
-        }
-
-        if(k === 'pid' && (v.length !== 9 || !v.split('').every((x)=> '0123456789'.includes(x)))){
-            valid = false
-            continue;
-        } 
-               
+        valid = checkValid[k]               
     }
    return valid
 }

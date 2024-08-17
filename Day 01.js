@@ -5,14 +5,4 @@ let lines = input.split(/[\r\n]+/).map(Number)
 
 console.log(lines.filter((x,ix,arr)=> arr.includes(2020-x)).reduce((acc,curr)=>acc*curr,1)) // Part 1
 
-console.log(lines.filter((x,ix,arr)=>{
-    let remainder = 2020-x
-    let notx = arr.filter((y,yix)=> yix !== ix)
-    let addToRemainder = notx.filter((z,zx,zarr)=>zarr.includes(remainder-z))
-    if(addToRemainder.length>0){
-        return true
-    } else {
-        return false
-    }
-}).reduce((acc,curr)=>acc*curr,1)) // Part 2
-
+console.log(lines.filter((x,ix,arr)=>arr.filter((z,zx,zarr)=>zx !== ix && zarr.includes(2020-x-z)).length>0).reduce((acc,curr)=>acc*curr,1)) // Part 2

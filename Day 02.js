@@ -5,21 +5,14 @@ let lines = input.split(/[\r\n]+/).map((x)=> x.match(/(\w+)/g)).map((x)=> x.map(
 
 // Part 1
 console.log(lines.filter(([min,max,letter,password])=>{
-    let valid = password.split('').filter((x)=> x === letter).length
+    let valid = password.split('').filter((x)=> x === letter).length;
 
-    if(min<= valid && valid <= max){
-        return true
-    } else {
-        return false
-    }
+    return min<= valid && valid <= max
 }).length)
 
 // Part 2
 console.log(lines.filter(([min,max,letter,password])=>{
-    let split = password.split('')
-    if ((split[min-1] === letter && split[max-1] !== letter) || (split[max-1] === letter && split[min-1] !== letter)){
-        return true
-    } else {
-        return false
-    }
+    let split = password.split('');
+    
+    return ((split[min-1] === letter && split[max-1] !== letter) || (split[max-1] === letter && split[min-1] !== letter))
 }).length)

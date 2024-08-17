@@ -10,14 +10,11 @@ function toboggan(right,down){
     let toboggan = [0+down,0+right]
     let treeCount = 0
 
-    while(toboggan[0]<rowlen){
-        let encounter = lines[toboggan[0]][toboggan[1]]
-    
-        if(encounter === '#'){
-            treeCount++
-        }
-    
-        toboggan = [toboggan[0]+down,(toboggan[1]+right)%collen]
+    while(toboggan[0]<rowlen){    
+        if(lines[toboggan[0]][toboggan[1]] === '#') treeCount++ ;
+        
+        toboggan[0]+= down;
+        toboggan[1] = (toboggan[1]+right)%collen;
     }
 
     return treeCount

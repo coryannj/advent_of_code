@@ -12,18 +12,14 @@ function getAcc(arr,p1orp2){
     while(queue.length>0 && !seen.has(queue[0][0]) && queue[0][0] !== lines.length-1){
         let [ind,dir,val] = queue.shift()
         seen.add(ind)
-    
-        if(dir === 'acc' || dir === 'nop'){
-            acc += dir === 'acc' ? val : 0
-            queue.push(loop[ind+1])
-            continue;
+
+        if(dir === 'acc'){
+            acc += val
         }
-    
-        if(dir === 'jmp'){
-            queue.push(loop[ind+val])
-            continue;
-        }
-    
+
+        let nextInd = dir === 'jmp' ? ind+val : ind+1
+        queue.push(loop[nextInd])
+        
     }
     
     return p1orp2 === 'p1' ? acc : [acc,queue[0][0]]

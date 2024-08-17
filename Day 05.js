@@ -6,7 +6,7 @@ let lines = input.split(/[\r\n]+/).map((x)=> [x.slice(0,7).split(''),x.slice(7).
 function findSeat(roworcol,arr){
     let num = roworcol === 'row' ? 128 : 8
     let all = Array(num).fill('.').map((x,i)=>i)
-    let dirs = arr.slice()
+    let dirs = structuredClone(arr)
     let len = all.length
     
     while(all.length>1 && dirs.length>0){
