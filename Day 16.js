@@ -8,7 +8,8 @@ let fieldnames = lines[0].split(/[\r\n]+/).flatMap((x)=>x.match(/^\w+/gm));
 let yourTicket = lines[1].split(/[\r\n]+/).slice(1).map((x)=>x.split(',').map(Number));
 
 // Part 1
- let restTickets = lines[2].split(/[\r\n]+/).slice(1).map((x)=>x.split(',').map(Number))
+let restTickets = lines[2].split(/[\r\n]+/).slice(1).map((x)=>x.split(',').map(Number))
+
 console.log(restTickets.flatMap((x)=> x.filter((y)=> {
     return fields.flat().every(([min,max])=> y<min || y>max)
 })).reduce((acc,curr)=>acc+curr)) // Part 1 answer
@@ -27,9 +28,10 @@ let minMax = [];
 for(i=0;i<ticketLength;i++){
     let vals = validTickets.flatMap((x)=> x[i])
 
-    let fieldIndex = fields.map((x,ix,arr)=> {        
-       return vals.every((val)=> x.some(([min,max])=>min<=val && val<=max))
-    }).map((y,yx)=> y === true ? yx : '').filter((z)=> typeof z === 'number')
+    let fieldIndex = fields
+    .map((x,ix,arr)=> vals.every((val)=> x.some(([min,max])=>min<=val && val<=max)))
+    .map((y,yx)=> y === true ? yx : '')
+    .filter((z)=> typeof z === 'number')
 
     minMax.push([i,fieldIndex])
 
