@@ -11,8 +11,8 @@ let allergies = {}
 allAllergens.forEach((allergen)=>{
     let matching = lines.filter(([ing,all])=> all.includes(allergen))
 
-    let ingredient = allIngredients.filter((x)=> matching.every(([ing,all])=> ing.includes(x)))
-    allergies[allergen] = ingredient
+    let ingredients = allIngredients.filter((x)=> matching.every(([ing,all])=> ing.includes(x)))
+    allergies[allergen] = ingredients
 })
 
 let identified = Object.entries(allergies).filter((x)=>x[1].length === 1).flatMap((x)=>x[1])
@@ -22,7 +22,7 @@ while(Object.entries(allergies).some((x)=>x[1].length > 1 && x[1].some((y)=>iden
 
     remove.forEach(([a,ingr])=>{
         let updatedIngredients = allergies[a].filter((x)=> !identified.includes(x))
-        console.log(updatedIngredients)
+
         allergies[a] = updatedIngredients
 
         if(updatedIngredients.length === 1){
