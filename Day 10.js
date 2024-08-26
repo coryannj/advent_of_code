@@ -24,10 +24,6 @@ while(queue.length>0){
 
 }
 
-
-
-
-
 let allAdapters = [...adapters.entries()]
 
 let oneJolt = 0
@@ -44,53 +40,41 @@ allAdapters.forEach(([jolt,diffs])=>{
     })
 })
 
-console.log(oneJolt*threeJolt)
+console.log(oneJolt*threeJolt) // Part 1 answer
 
-
-
-
+// Part 2
 let combos = [...fullAdapters.entries()]
+let comboTotal = []
+let combosLen = combos.length
 
+let startIndex = 0
+let sliceIndex = 0
 
-let queue2 = 0
-let comboCount = []
+while(sliceIndex<combosLen-1){
+    sliceIndex = combos.findIndex((x,ix,arr)=>ix>startIndex && x[1].length === 1 && x[0]+3 === x[1][0] && (ix===combosLen-1||arr[ix+1][1].length>1))
 
-while(queue2.length>0){
-    let thisPath = queue2.shift()
-    let last = next.at(-1)
-    let nextPaths = []
+    let comboSlice = combos.slice(startIndex,sliceIndex+1)
+    let startNode = comboSlice[0][0]
+    let endNode = comboSlice.at(-1)[1][0]
 
-    let nextArr = fullAdapters[last]
+    let queue = [[startNode]]
+    let result = []
+    while(queue.length>0){
+        let thisNode = queue.shift()
+        let nextArr = fullAdapters.get(thisNode.at(-1))
 
-    if(nextArr.length === 1 && (nextArr.at(-1) === maxJolts ||fullAdapters[nextArr.at(-1)].length === 3)){
-        comboCount.push(queue2)
-
-    } else {
-
+        nextArr.forEach((nextNode)=>{
+            if(nextNode !==endNode){
+                queue.push(thisNode.concat(nextNode))
+            } else {
+                result.push(thisNode.concat(nextNode))
+            }
+        })
     }
 
+    comboTotal.push(result.length)    
+    startIndex = sliceIndex+1
 }
 
+console.log(comboTotal.reduce((acc,curr)=>acc*curr,1)) // Part 2 answer
 
-
-console.log(combos.findIndex(([k,v],ix,arr)=> v.length === 1 && arr[ix+1][1].length>1))
-
-let sliceStart = 0
-let sliceEnd = combos.findIndex(([k,v],ix,arr)=> ix>sliceStart && v.length === 1 && (arr[ix+1][1].length===3||arr[ix+1][1].includes(maxJolts)))+1
-console.log(sliceEnd)
-
-let thisSlice = combos.slice(sliceStart,sliceEnd)
-console.log(thisSlice)
-let endVal = thisSlice.at(-1)[1][0]
-console.log(endVal)
-let comboTotal = []
-
-
-
-
-while(sliceEnd !== -1){
-    let thisSlice = combos.slice(sliceStart,sliceEnd)
-    let endVal = thisSlice.at(-1)[1][0]
-    let paths = new Set()
-
-}
