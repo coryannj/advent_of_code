@@ -1,153 +1,288 @@
 const fs = require('fs');
 const input = fs.readFileSync('../day23input.txt',{ encoding: 'utf8', flag: 'r' });
-
 const lines = input.split(/[\r\n]+/).map((x)=>x.trim())
-console.log(lines)
 
 let roomCol = lines[2].slice(1,-1).split('').map((x,ix)=> x === '#' ? x : ix).filter((x)=> x !== '#')
-let roomAbove = 'abcd'
-let amph = 'ABCD'
-
-//console.log(roomCol)
-
+let hallwayMap = lines[1].slice(1,-1).split('')
 let roomToHallway = {
-    'a-L': [1,0],
-    'a-R': [3,5,7,9,10],
-    'b-L': [3,1,0],
-    'b-R': [5,7,9,10],
-    'c-L': [5,3,1,0],
-    'c-R': [7,9,10],
-    'd-L': [7,5,3,1,0],
-    'd-R': [9,10]
+    '2': [[1,0],[3,5,7,9,10]],
+    '4': [[3,1,0],[5,7,9,10]],
+    '6': [[5,3,1,0],[7,9,10]],
+    '8': [[7,5,3,1,0],[9,10]]
 }
-let hallwayToRoom = {
-    'a-2': [12,13],
-    'b-4': [15,16],
-    'c-6': [18,19],
-    'd-8': [21,22]
-}
+let energy = {'A':1,'B':10,'C':100,'D':1000}
+let home = 'ABCD'
+let p1RoomLen = 2
+let p2RoomLen = 4
 
-let str = '..a.b.c.d..-BA-CD-BC-DA'
-let roomsCanMove = Object.entries(hallwayToRoom).map(([k,v])=> [k,v.filter((x,ix,arr)=> (ix === 0 && str[x] !== '.' && (str[x] !== k.toUpperCase()||(str[x]===k.toUpperCase() && str[ix+1] !== k.toUpperCase()))) || (ix === 1 && str[x-1] === '.' && str[x] !== '.' && str[x] !== k.toUpperCase()))])
+// Part 1 setup
+let p1roomMap = lines.slice(2,4).map((x)=>x.match(/\w/g))
+let p1roomsArr = roomCol.map((x,ix)=>p1roomMap.map((y)=>y[ix]))
+let p1state = [0,hallwayMap.slice(),structuredClone(p1roomsArr)]
+let p1queue = Array(50000).fill('.').map((x)=>[])
+p1queue[0].push(p1state)
+let p1currentMin = 10000000
+let p1MinStates = {}
 
-console.log(roomsCanMove)
+// Part 2 setup
+let p2line1 = '#D#C#B#A#'
+let p2line2 = '#D#B#A#C#'
+let p2roomMap = [lines[2],p2line1,p2line2,lines[3]].map((x)=>x.match(/\w/g))
+let p2roomsArr = roomCol.map((x,ix)=>p2roomMap.map((y)=>y[ix]))
+let p2state = [0,hallwayMap.slice(),structuredClone(p2roomsArr)]
+let p2queue = Array(100000).fill('.').map((x)=>[])
+p2queue[0].push(p2state)
+let p2currentMin = 10000000
+let p2MinStates = {}
 
-Object.entries(roomToHallway).forEach(([k,v])=> {
-    if (str[v[0]] === '.'){
-        if(str[v[1]]=== '.'){
+function roomToRoom(score,hallway,rooms,roomToRoomIndex,p1orp2){
+    let thisRoom = rooms[roomToRoomIndex]
+    let valToMove = rooms[roomToRoomIndex][0]
+    let homeIndex = home.indexOf(valToMove)
+    let currRoom = roomCol[roomToRoomIndex]
+    let homeRoom = roomCol[homeIndex]
+    let destRoom = rooms[homeIndex]
+    let path = currRoom<homeRoom ? hallway.slice(currRoom,homeRoom):hallway.slice(homeRoom,currRoom)
+    let roomLen = p1orp2 === 'p1' ? p1RoomLen : p2RoomLen
 
-        }
-    }
-})
-
-
-
-let strSplit = str.split('')
-
-roomsCanMove.forEach(([room,vals])=>{
-    console.log('room, vals',room,vals)
-    let hallwayLR = Object.entries(roomToHallway).filter(([k,v])=> k.charAt(0) === room.charAt(0)).map((x)=>x[1].filter((h,hix,harr)=> str[h] === '.' && harr.slice(0,hix).every((v)=>!amph.includes(str[v]))))
-    
-    console.log(hallwayLR)
-    // hallwayLR.forEach((dir)=>{
-    //     for(i=0;i<dir.length;i++){
-    //         if(str[dir[i]] === '.'){
-
-    //         }
-    //     }
-    // })
-})
-
-
-
-
-let hallway = lines[1].slice(1,-1).split('').map((x,idx)=> roomCol.includes(idx) ? roomAbove[roomCol.indexOf(idx)] : x).join('')
-console.log(hallway)
-
-let hallwayIndexes = hallway.split('').map((x,idx)=> x === '.' ? idx : x).filter((y)=>typeof y === 'number')
-
-console.log(hallwayIndexes)
-
-let rooms1 = lines[2].split('').filter((x)=> x!=='#')
-console.log(rooms1)
-let rooms2 = lines[3].split('').filter((x)=> x!=='#')
-console.log(rooms2)
-
-for(i=0;i<rooms1.length;i++){
-    hallway+=('-'+rooms1[i]+rooms2[i])
-}
-
-console.log(hallway)
-
-
-
-let current_room = 'a'
-
-//let moves = new RegExp(`([.]+${current_room}[.]*|[.]*${current_room}[.]+)`, "m")
-//console.log(str.match(moves))
-
-let roomMap = '..a.b.c.d..aAAbBBcCCdDD'
-
-// if current room === a
-//hallwayIndexes.slice(0,3) - check 1 must be '.' to go to 0 [ 0, 1, 3 ]
-// room b = console.log(hallwayIndexes.slice(2,4)) [ 3, 5 ]
-// room c = console.log(hallwayIndexes.slice(3,5)) [ 5, 7 ]
-// room d = console.log(hallwayIndexes.slice(4)) [ 7, 9, 10 ]
-
-
-// hallway - index before '-'
-// rooms - each indexes after '-'
-// needs to move char= char toUpperCase && either at bottom of home room, or top of home room next to itself on index+1
-// Can move
-//  - In room and either at top of room, or bottom of room next to '.' and there is a free '.' in the hallway
-//  - In hallway and both of its home room are '..' or '.' followed by itself and there is clear run of '.' and no uppercase letters
-
-function roomToHallway(){
-    // curr room index = hallway char = index of char to lower case
-    // get left of room index in hallway
-    // get right of room index in hallway
-    // slice hallway from room index out
-}
-
-function hallwayToRoom(){
-
-}
-
-
-// let hallway = lines[1].map((x,ix)=> x === '#'||roomCol.includes(ix)?x:ix).filter((x)=> x !== '#' && x !=='.')
-// console.log(hallway)
-
-let rowlen = lines.length
-let collen = lines[0].length
-let rooms = 'ABCD'
-let gates = 'abcd'
- 
-
-let board = {}
-
-for(i=0;i<rowlen;i++){
-    for(j=0;j<collen;j++){
-        let thisVal = lines[i][j]
-        if(!'# '.includes(thisVal)){
-            let nextVals
-
-            if(thisVal === '.'){
-                nextVals = [[i,j-1],[i,j+1],[i-1,j],[i+1,j]].filter(([r,c])=>0<= r && r < rowlen && 0 <= c && c < collen && lines[r][c] !== '#')
+    if(path.every((z)=>z === '.')){
+        //roomToRoom = true
+        let toHallSteps = roomLen-thisRoom.length+1
+        let hallSteps = path.length
+        let roomSteps = roomLen-destRoom.length
+        let newScore = score+((toHallSteps+hallSteps+roomSteps)* energy[valToMove])
+        let newRooms = rooms.map((r,rx)=>{
+            if(rx === roomToRoomIndex){
+                return r.slice(1)
+            } else if (rx === homeIndex){
+                return [valToMove].concat(r)
             } else {
-                nextVals = [[i-1,j],[i+1,j]].filter(([r,c])=>0<= r && r < rowlen && 0 <= c && c < collen && lines[r][c] !== '#')
+                return r
             }
+        })
 
-            board[`${i}-${j}`] = {
-                'value': thisVal,
-                'nextVals': nextVals
+        return [newScore,hallway,newRooms]
+
+    } else {
+        return []
+    }
+}
+
+function hallwayToRoom(score,hallway,rooms,hallwayToRoomIndex,p1orp2){
+    let hallwayVal = hallway[hallwayToRoomIndex]
+    let homeIndex = home.indexOf(hallwayVal)
+    let homeRoom = roomCol[homeIndex]
+    let destRoom = rooms[homeIndex]
+    let hallSteps = hallwayToRoomIndex<homeRoom ? homeRoom-hallwayToRoomIndex : hallwayToRoomIndex-homeRoom
+    let roomLen = p1orp2 === 'p1' ? p1RoomLen : p2RoomLen
+    let roomSteps = roomLen-destRoom.length
+    let newScore = score+((hallSteps+roomSteps)*energy[hallwayVal])
+    let newRooms = rooms.map((r,rx)=>rx === homeIndex?[hallwayVal].concat(r):r)
+    let newHallway = hallway.map((nx,nix)=>nix === hallwayToRoomIndex ? '.':nx)
+    
+    return [newScore,newHallway,newRooms]
+}
+
+function pushToQueue(newScore,newHallway,newRooms,currMin,p1orp2){
+    let pkey = [newScore,newHallway,newRooms].slice(1).map((x)=>x.join('')).join('-')
+    if(newScore<currMin){
+        if(p1orp2 === 'p1'){
+            if(p1MinStates[pkey] === undefined){
+                p1MinStates[pkey] = newScore
+                p1queue[newScore].push([newScore,newHallway,newRooms])
+            } else {
+                if(newScore<p1MinStates[pkey]){
+                    p1MinStates[pkey] = newScore
+                    p1queue[newScore].push([newScore,newHallway,newRooms])
+                }
+            }
+            //p1queue[newScore].push([newScore,,rooms.map((r,rx)=>rx === vx ? r.slice(1):r)])
+        } else {
+            if(p2MinStates[pkey] === undefined){
+                p2MinStates[pkey] = newScore
+                p2queue[newScore].push([newScore,newHallway,newRooms])
+            } else {
+                if(newScore<p2MinStates[pkey]){
+                    p2MinStates[pkey] = newScore
+                    p2queue[newScore].push([newScore,newHallway,newRooms])
+                }
             }
         }
     }
 }
 
-Object.entries(board).forEach(([k,v])=>console.log(v))
+function getRoomToHallway(score,hallway,rooms,currMin,p1orp2){
+    let roomCanMove = rooms.map((vals,ix)=>vals.length>0 && !vals.every((x)=>x ===home[ix])?vals:[])
+    let roomLen = p1orp2 === 'p1' ? p1RoomLen : p2RoomLen
+    roomCanMove.map((v,vx)=>{
+        //console.log('*** NEW ROOM ***')
+        //console.log('v , vx ',v,vx)
 
-let toproom = Object.keys(board).filter((x)=>x.charAt(0)==='2')
-let btmroom = Object.keys(board).filter((x)=>x.charAt(0)==='3')
+        if(v.length>0){
+            const thisRoomLen = v.length
+            const colIndex = roomCol[vx]
+            const roomSteps = roomLen-thisRoomLen+1
 
-console.log(toproom,btmroom)
+            let [left,right] = roomToHallway[roomCol[vx]]
+
+            for(i=0;i<left.length;i++){
+                let lefthallwayIdx = left[i]
+                let lefthallwayVal = hallway[lefthallwayIdx]
+                if(lefthallwayVal==='.'){
+                    let lefthallSteps = colIndex<lefthallwayIdx? lefthallwayIdx-colIndex : colIndex-lefthallwayIdx
+                    let newScore = score+((roomSteps+lefthallSteps)*energy[v[0]])
+                    let newHallway = hallway.map((h,hx)=>hx ===lefthallwayIdx? v[0] : h)
+                    let newRooms = rooms.map((r,rx)=>rx === vx ? r.slice(1):r)
+                    pushToQueue(newScore,newHallway,newRooms,currMin,p1orp2)
+
+                } else {
+                    break;
+                }
+            }
+
+           for(j=0;j<right.length;j++){
+            let righthallwayIdx = right[j]
+            let righthallwayVal = hallway[righthallwayIdx]
+            if(righthallwayVal==='.'){
+                let righthallSteps = colIndex<righthallwayIdx? righthallwayIdx-colIndex : colIndex-righthallwayIdx
+                let newScore = score+((roomSteps+righthallSteps)*energy[v[0]])
+                let newHallway = hallway.map((h,hx)=>hx ===righthallwayIdx? v[0] : h)
+                let newRooms = rooms.map((r,rx)=>rx === vx ? r.slice(1):r)
+                pushToQueue(newScore,newHallway,newRooms,currMin,p1orp2)
+
+            } else {
+                break;
+            }
+           }
+        }
+    })
+}
+
+// Part 1
+while(p1queue.findIndex((x)=>x.length>0) !== -1){
+    let [score,hallway,rooms]= p1queue[p1queue.findIndex((x)=>x.length>0)].shift()
+    
+    if(score>p1currentMin && p1MinStates[p1state.slice(1).map((x)=>x.join('')).join('-')] !== undefined && p1MinStates[p1state.slice(1).map((x)=>x.join('')).join('-')]<score){
+        continue;
+    }
+    
+    //Room to room
+    let roomToRoomIndex = rooms.findIndex((r,rx,roomArr)=> r.length > 0 && home.indexOf(r[0]) !== rx && (roomArr[home.indexOf(r[0])].length === 0 || roomArr[home.indexOf(r[0])].every((z)=>z === r[0])))
+
+    if(roomToRoomIndex !== -1){
+        let next = roomToRoom(score,hallway,rooms,roomToRoomIndex,'p1')
+
+        if(next.length>0){
+            let [newScore,newHallway,newRooms] = next
+            if(newScore<p1currentMin){
+                if(newRooms.some((y,yx)=>y.length !== p1RoomLen || y.some((z)=>z !== home[yx]))){
+                    pushToQueue(newScore,newHallway,newRooms,p1currentMin,'p1')
+                } else {
+                    p1currentMin = newScore
+                }
+            }  
+            continue;
+        }
+    }
+
+    // Hallway to room
+    let hallwayToRoomIndex = hallway.findIndex((h,hx,harr)=>{
+        if(h === '.'){
+            return false
+        } else {
+            let homeIndex = roomCol[home.indexOf(h)]
+            let path = hx<homeIndex ? harr.slice(hx+1,homeIndex+1):harr.slice(homeIndex,hx)
+            let homeRoom = rooms[home.indexOf(h)]
+
+            return path.every((p)=>p === '.') && (homeRoom.length === 0 || homeRoom.every((hv)=>hv === h))
+        }
+
+    })
+
+    
+    if(hallwayToRoomIndex !== -1){
+        let [newScore,newHallway,newRooms] = hallwayToRoom(score,hallway,rooms,hallwayToRoomIndex,'p1')
+        
+        if(newScore<p1currentMin){
+            if(newRooms.some((y,yx)=>y.length !== p1RoomLen || y.some((z)=>z !== home[yx]))){
+                pushToQueue(newScore,newHallway,newRooms,p1currentMin,'p1')
+            } else {
+                p1currentMin = newScore
+            }
+        } 
+    
+        continue;
+    }
+
+    // Room to Hallway
+    if (rooms.some((y,yx)=>y.length>0 && y.some((z)=> z !==home[yx]))){
+        getRoomToHallway(score,hallway,rooms,p1currentMin,'p1')
+    }
+
+}
+
+console.log('Part 1 answer is ',p1currentMin)
+
+// Part 2
+while(p2queue.findIndex((x)=>x.length>0) !== -1){
+    let [score,hallway,rooms]= p2queue[p2queue.findIndex((x)=>x.length>0)].shift()
+    
+    if(score>p2currentMin && p2MinStates[p1state.slice(1).map((x)=>x.join('')).join('-')] !== undefined && p2MinStates[p1state.slice(1).map((x)=>x.join('')).join('-')]<score){
+        continue;
+    }
+    
+    //Room to room
+    let roomToRoomIndex = rooms.findIndex((r,rx,roomArr)=> r.length > 0 && home.indexOf(r[0]) !== rx && (roomArr[home.indexOf(r[0])].length === 0 || roomArr[home.indexOf(r[0])].every((z)=>z === r[0])))
+
+    if(roomToRoomIndex !== -1){
+        let next = roomToRoom(score,hallway,rooms,roomToRoomIndex,'p2')
+
+        if(next.length>0){
+            let [newScore,newHallway,newRooms] = next
+            if(newScore<p2currentMin){
+                if(newRooms.some((y,yx)=>y.length !== p2RoomLen || y.some((z)=>z !== home[yx]))){
+                    pushToQueue(newScore,newHallway,newRooms,p2currentMin,'p2')
+                } else {
+                    p2currentMin = newScore
+                }
+            }  
+            continue;
+        }
+    }
+
+    // Hallway to room
+    let hallwayToRoomIndex = hallway.findIndex((h,hx,harr)=>{
+        if(h === '.'){
+            return false
+        } else {
+            let homeIndex = roomCol[home.indexOf(h)]
+            let path = hx<homeIndex ? harr.slice(hx+1,homeIndex+1):harr.slice(homeIndex,hx)
+            let homeRoom = rooms[home.indexOf(h)]
+
+            return path.every((p)=>p === '.') && (homeRoom.length === 0 || homeRoom.every((hv)=>hv === h))
+        }
+
+    })
+    
+    if(hallwayToRoomIndex !== -1){
+        let [newScore,newHallway,newRooms] = hallwayToRoom(score,hallway,rooms,hallwayToRoomIndex,'p2')
+        
+        if(newScore<p2currentMin){
+            if(newRooms.some((y,yx)=>y.length !== p2RoomLen || y.some((z)=>z !== home[yx]))){
+                pushToQueue(newScore,newHallway,newRooms,p2currentMin,'p2')
+            } else {
+                p2currentMin = newScore
+            }
+        } 
+    
+        continue;
+    }
+
+    // Room to Hallway
+    if (rooms.some((y,yx)=>y.length>0 && y.some((z)=> z !==home[yx]))){
+        getRoomToHallway(score,hallway,rooms,p2currentMin,'p2')
+    }
+
+}
+
+console.log('Part 2 answer is ',p2currentMin)
