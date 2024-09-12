@@ -19,10 +19,11 @@ let p2RoomLen = 4
 let p1roomMap = lines.slice(2,4).map((x)=>x.match(/\w/g))
 let p1roomsArr = roomCol.map((x,ix)=>p1roomMap.map((y)=>y[ix]))
 let p1state = [0,hallwayMap.slice(),structuredClone(p1roomsArr)]
-let p1queue = Array(50000).fill('.').map((x)=>[])
+let p1queue = Array(25000).fill('.').map((x)=>[])
 p1queue[0].push(p1state)
-let p1currentMin = 10000000
+let p1currentMin = 1000000
 let p1MinStates = {}
+let p1DeadEnd = new Set ()
 
 // Part 2 setup
 let p2line1 = '#D#C#B#A#'
@@ -30,10 +31,11 @@ let p2line2 = '#D#B#A#C#'
 let p2roomMap = [lines[2],p2line1,p2line2,lines[3]].map((x)=>x.match(/\w/g))
 let p2roomsArr = roomCol.map((x,ix)=>p2roomMap.map((y)=>y[ix]))
 let p2state = [0,hallwayMap.slice(),structuredClone(p2roomsArr)]
-let p2queue = Array(100000).fill('.').map((x)=>[])
+let p2queue = Array(60000).fill('.').map((x)=>[])
 p2queue[0].push(p2state)
-let p2currentMin = 10000000
+let p2currentMin = 1000000
 let p2MinStates = {}
+let p2DeadEnd = new Set()
 
 function roomToRoom(score,hallway,rooms,roomToRoomIndex,p1orp2){
     let thisRoom = rooms[roomToRoomIndex]
@@ -87,25 +89,19 @@ function pushToQueue(newScore,newHallway,newRooms,currMin,p1orp2){
     let pkey = [newScore,newHallway,newRooms].slice(1).map((x)=>x.join('')).join('-')
     if(newScore<currMin){
         if(p1orp2 === 'p1'){
-            if(p1MinStates[pkey] === undefined){
-                p1MinStates[pkey] = newScore
-                p1queue[newScore].push([newScore,newHallway,newRooms])
-            } else {
-                if(newScore<p1MinStates[pkey]){
+            if(!p1DeadEnd.has(pkey)){
+                if(p1MinStates[pkey] === undefined || newScore<p1MinStates[pkey]){
                     p1MinStates[pkey] = newScore
                     p1queue[newScore].push([newScore,newHallway,newRooms])
-                }
+                } 
             }
-            //p1queue[newScore].push([newScore,,rooms.map((r,rx)=>rx === vx ? r.slice(1):r)])
+
         } else {
-            if(p2MinStates[pkey] === undefined){
-                p2MinStates[pkey] = newScore
-                p2queue[newScore].push([newScore,newHallway,newRooms])
-            } else {
-                if(newScore<p2MinStates[pkey]){
+            if(!p2DeadEnd.has(pkey)){
+                if(p2MinStates[pkey] === undefined || newScore<p2MinStates[pkey]){
                     p2MinStates[pkey] = newScore
                     p2queue[newScore].push([newScore,newHallway,newRooms])
-                }
+                } 
             }
         }
     }
@@ -162,7 +158,7 @@ function getRoomToHallway(score,hallway,rooms,currMin,p1orp2){
 while(p1queue.findIndex((x)=>x.length>0) !== -1){
     let [score,hallway,rooms]= p1queue[p1queue.findIndex((x)=>x.length>0)].shift()
     
-    if(score>p1currentMin && p1MinStates[p1state.slice(1).map((x)=>x.join('')).join('-')] !== undefined && p1MinStates[p1state.slice(1).map((x)=>x.join('')).join('-')]<score){
+    if(score>p1currentMin || (p1MinStates[p1state.slice(1).map((x)=>x.join('')).join('-')] !== undefined && p1MinStates[p1state.slice(1).map((x)=>x.join('')).join('-')]<score)){
         continue;
     }
     
@@ -217,7 +213,10 @@ while(p1queue.findIndex((x)=>x.length>0) !== -1){
     // Room to Hallway
     if (rooms.some((y,yx)=>y.length>0 && y.some((z)=> z !==home[yx]))){
         getRoomToHallway(score,hallway,rooms,p1currentMin,'p1')
+        continue;
     }
+
+    p1DeadEnd.add([score,hallway,rooms].slice(1).map((x)=>x.join('')).join('-'))
 
 }
 
@@ -227,7 +226,8 @@ console.log('Part 1 answer is ',p1currentMin)
 while(p2queue.findIndex((x)=>x.length>0) !== -1){
     let [score,hallway,rooms]= p2queue[p2queue.findIndex((x)=>x.length>0)].shift()
     
-    if(score>p2currentMin && p2MinStates[p1state.slice(1).map((x)=>x.join('')).join('-')] !== undefined && p2MinStates[p1state.slice(1).map((x)=>x.join('')).join('-')]<score){
+    if(score>p2currentMin || (p2MinStates[p1state.slice(1).map((x)=>x.join('')).join('-')] !== undefined && p2MinStates[p1state.slice(1).map((x)=>x.join('')).join('-')]<score)){
+        
         continue;
     }
     
@@ -281,8 +281,9 @@ while(p2queue.findIndex((x)=>x.length>0) !== -1){
     // Room to Hallway
     if (rooms.some((y,yx)=>y.length>0 && y.some((z)=> z !==home[yx]))){
         getRoomToHallway(score,hallway,rooms,p2currentMin,'p2')
+        continue;
     }
-
+    p2DeadEnd.add([score,hallway,rooms].slice(1).map((x)=>x.join('')).join('-'))
 }
 
 console.log('Part 2 answer is ',p2currentMin)
