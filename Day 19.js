@@ -26,15 +26,15 @@ let scannerMap = {} // points for each scanner
 
 scanners.forEach((x,sidx)=>{
     distMap[sidx] = {}
-    scannerMap[sidx] = {}
+    scannerMap[sidx] = Object.fromEntries(x)
     while(x.length>0){
         let [bidx,bPoints] = x.shift()
-        scannerMap[sidx][bidx] = bPoints
         x.forEach(([oidx,oPoints])=>{
         distMap[sidx][`${bidx}-${oidx}`] = pairDistance(bPoints,oPoints)
          })
     }
 })
+
 /* 
     **** Finding correct rotation ****
 
