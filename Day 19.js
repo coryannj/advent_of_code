@@ -6,6 +6,10 @@ const lines = input.split(/\n\n/)
 
 const scanners = lines.map((x)=>x.split(/[\r\n]+/).slice(1)).map((x)=>x.map((y,yidx)=>[yidx,y.split(',').map(Number)]))
 
+// Part 1
+let scannerLen = scanners.length
+
+// From https://imgur.com/Ff1vGT9
 const rotations = ([x,y,z]) => [
     [x,y,z],    [x,z,-y],   [x,-y,-z],  [x,-z,y],
     [-x,-y,z],  [-x,z,y],   [-x,y,-z],  [-x,-z,-y],  
@@ -20,9 +24,7 @@ const pairDistance = ([px1,py1,pz1],[px2,py2,pz2]) => [Math.pow(Math.abs(px2-px1
 let distMap = {} // distances between all pairs of points
 let scannerMap = {} // points for each scanner
 
-let scan = structuredClone(scanners)
-
-scan.forEach((x,sidx)=>{
+scanners.forEach((x,sidx)=>{
     distMap[sidx] = {}
     scannerMap[sidx] = {}
     while(x.length>0){
@@ -33,23 +35,41 @@ scan.forEach((x,sidx)=>{
          })
     }
 })
+/* 
+    **** Finding correct rotation ****
 
-const findScanner = ([ref1,ref2],[over1,over2]) =>{
+    - We have found matching pairs of points with same distance i.e.:
+        - Scanner 1: [point A, point B] with distAB as [ABx,ABy,ABz] - our reference scanner
+        - Scanner 2: [point C, point D] with distCD as [CDx,CDy,CDz]
+        - Where distAB === distCD for all axes
+    - So we know point A is point C and point B is point D where C and D have some rotation and offset 
+    - This means correct rotation is where dist AC === dist BD for all axes
+    - So to find correct rotation:
+        - Generate all rotations for Point C and Point D
+        - Calculate distAC and distBD accordingly
+        - Check for some rotation index where dist AC === dist BD
+        - If no index found try opp pairing i.e. AD and BC
+    - Note: For generalised solution I think you'd need to expand to 3 points per scanner - but assumption is that the input was kind :-)
+*/
+const findScanner = ([[ref1,ref2],[over1,over2]]) =>{
+    let opp = false
     let over1Rotations = rotations(over1).map((x)=>pairDistance(ref1,x))
     let over2Rotations = rotations(over2).map((x)=>pairDistance(ref2,x))
-
     let rotationIndex = over1Rotations.findIndex((x,ix)=> x.every((v,vx)=> v === over2Rotations[ix][vx]))
 
     if(rotationIndex === -1){
-        return []
-    } else {
-        let correctRotation = rotations(over1)[rotationIndex]
+        opp = true
+        over1Rotations = rotations(over1).map((x)=>pairDistance(ref2,x))
+        over2Rotations = rotations(over2).map((x)=>pairDistance(ref1,x))
+        rotationIndex = over1Rotations.findIndex((x,ix)=> x.every((v,vx)=> v === over2Rotations[ix][vx]))
+    } 
+    
+    let correctRotation = rotations(over1)[rotationIndex]
 
-        return [rotationIndex,ref1.map((x,ix)=>x-correctRotation[ix])]
-    }
-
+    return (opp) ? [rotationIndex,ref2.map((x,ix)=>x-correctRotation[ix])] : [rotationIndex,ref1.map((x,ix)=>x-correctRotation[ix])]
 }
 
+// Once we've found correct rotation - update all points and pair distances for that scanner from position of Scanner 0
 const toScanner0 = (scannerIndex,[rotationIndex,scanner]) => {
     Object.keys(scannerMap[scannerIndex]).forEach((key)=>{
         scannerMap[scannerIndex][key] = rotations(scannerMap[scannerIndex][key])[rotationIndex].map((x,ix)=>x+scanner[ix])
@@ -70,10 +90,9 @@ const toScanner0 = (scannerIndex,[rotationIndex,scanner]) => {
 
 let queue = ['0']
 let seen = []
-let beaconList = []
 let scannerList = []
 
-while(queue.length>0){
+while(queue.length+seen.length<scannerLen){
     let refScanner = queue.shift()
     seen.push(refScanner)
 
@@ -83,46 +102,41 @@ while(queue.length>0){
 
     otherBeacons.forEach(([oidx,oBeacons])=>{
 
-        let thisOverlap = refBeacons.flatMap(([rKey,rDist])=>{
+        let refLen = refBeacons.length-1
+        let thisOverlap = []
+
+        // Check for overlaps
+        for(i=refLen;i>=0;i--){
+            let [rKey,rDist] = refBeacons[i] 
             let sameDist = oBeacons.find(([oKey,oDist])=>[...new Set(rDist.concat(oDist))].length === 3)
 
-            if(sameDist === undefined){
-                return []
-            } else {
-                return[[[rKey,rDist],sameDist]]
+            if(sameDist !== undefined){
+                thisOverlap.push([rKey.split('-').map((x)=>scannerMap[refScanner][x]),sameDist[0].split('-').map((x)=>scannerMap[oidx][x])])
             }
 
-        })
-
-        let setOverlaps = [...new Set(thisOverlap.flatMap((x)=>x[0][0].split('-')))].sort((a,b)=>a.localeCompare(b)).map((y)=>`${refScanner}-${y}`)
-        
-        if(setOverlaps.length > 11){
-
-            setOverlaps.forEach((x)=>beaconList.push(x))
-
-            let scannerObj = []
-            while(scannerObj.length === 0){
-                let [[firstKeys,firstOverlaps],[matchKeys,matchOverlaps]] = thisOverlap.shift()
-                let firstKeySplit = firstKeys.split('-').map((x)=>scannerMap[refScanner][x])
-                let matchKeySplit = matchKeys.split('-').map((x)=>scannerMap[oidx][x])
-
-                scannerObj = findScanner(firstKeySplit,matchKeySplit)
+            if((thisOverlap.length+i)< 65||thisOverlap.length>=65){
+                break;
             }
+        }
 
-            toScanner0(oidx,scannerObj)
+        // If min number of overlaps found, get rotation and scanner by checking first pair of matching points
+        if(thisOverlap.length >= 65){
+            let scannerObj = findScanner(thisOverlap[0])
+
+            toScanner0(oidx,scannerObj) // update all points and all pair distances to Scanner 0 rotation
             scannerList.push(scannerObj[1])
             
             if(!queue.includes(oidx) && !seen.includes(oidx)){
-                queue.push(oidx)
+                queue.push(oidx) // Push found scanner to queue
             }
         }
 
    })
 }
 
-let fullList = [...new Set(Object.keys(scannerMap).flatMap((x)=>Object.values(scannerMap[x])).map((y)=>y.join('_')))]
+let fullList = new Set(Object.keys(scannerMap).flatMap((x)=>Object.values(scannerMap[x])).map((y)=>y.join('_')))
 
-console.log(fullList.length) // Part 1 answer
+console.log(fullList.size) // Part 1 answer
 
 // Part 2
 const manhattan = (s1,s2) => s1.map((x,ix)=>Math.abs(x-s2[ix])).reduce((acc,curr)=>acc+curr,0)
