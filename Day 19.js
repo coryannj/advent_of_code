@@ -133,13 +133,19 @@ function buildObsidian(oreClayObj,oreObsCost,clayObsCost){
 
 
 
-Object.keys(oreClay).forEach((ocKey)=>{
+let obindexes = Object.keys(oreClay).map((ocKey)=>{
     let thisOre = oreClay[ocKey]['ore']
     let thisClay = oreClay[ocKey]['clay']
     let lastRobotIndex = oreClay[ocKey]['oreBuildIndex']
     let obsIndex = thisClay.findIndex((x,ix,arr)=>ix>lastRobotIndex.at(-1) && arr[ix-1]>=14 && arr[ix]>=14 && thisOre[ix-1]>=3 && thisOre[ix]>=3)
     console.log(ocKey,' first obs index is ',obsIndex)
-})
+    if(obsIndex === 11){
+        console.log(oreClay[ocKey])
+    }
+    return [ocKey,obsIndex]
+}).sort((a,b)=>a[1]-b[1])
+
+console.log(oreClay[obindexes[0][0]])
 
 allOre.forEach((oreCost)=>{
     allClay.forEach((clayCost)=>{
