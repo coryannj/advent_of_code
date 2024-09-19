@@ -1,35 +1,48 @@
 const fs = require('fs');
 const input = fs.readFileSync('../day5input.txt',{ encoding: 'utf8', flag: 'r' });
 
-const reactRegex = /(aA|bB|cC|dD|eE|fF|gG|hH|iI|jJ|kK|lL|mM|nN|oO|pP|qQ|rR|sS|tT|uU|vV|wW|xX|yY|zZ|Aa|Bb|Cc|Dd|Ee|Ff|Gg|Hh|Ii|Jj|Kk|Ll|Mm|Nn|Oo|Pp|Qq|Rr|Ss|Tt|Uu|Vv|Ww|Xx|Yy|Zz)/
+let parse = input.split('')
 
-let currStr = input
-let newStr = currStr.replace(reactRegex,'')
+let seen = [parse.shift()]
 
-while(currStr.length !== newStr.length){
-    currStr = newStr    
-    newStr = currStr.replace(reactRegex,'')
+while(parse.length>0){
+    if(seen.length === 0){
+        seen.push(parse.shift())
+    }
+
+    if(seen.at(-1) !== parse[0] && seen.at(-1).toLowerCase()===parse[0].toLowerCase()){
+        seen.pop()
+        parse.shift()
+    } else {
+        seen.push(parse.shift())
+    }
 }
 
-console.log(newStr.length) // Part 1 answer
+console.log(seen.length)
 
-// Part 2
-let alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('')
-let minLen = 1000000
+let alphabet2 = 'abcdefghijklmnopqrstuvwxyz'.split('')
+let minLen2 = 1000000
 
-alphabet.forEach((letter)=>{
-    let remove = new RegExp(letter, "gi");
-    let currStr = input.replaceAll(remove,'')
-    let newStr = currStr.replace(reactRegex,'')
+alphabet2.forEach((letter)=>{
+    let parse = input.split('').filter((x)=>x.toLowerCase()!==letter.toLowerCase())
 
-    while(currStr.length !== newStr.length){
-        currStr = newStr    
-        newStr = currStr.replace(reactRegex,'')
+    let seen = [parse.shift()]
+    
+    while(parse.length>0){
+        if(seen.length === 0){
+            seen.push(parse.shift())
+        }
+    
+        if(seen.at(-1) !== parse[0] && seen.at(-1).toLowerCase()===parse[0].toLowerCase()){
+            seen.pop()
+            parse.shift()
+        } else {
+            seen.push(parse.shift())
+        }
     }
 
-    if(newStr.length<minLen){
-        minLen = newStr.length
+    if(seen.length<minLen2){
+        minLen2 = seen.length
     }
 })
-
-console.log(minLen) // Part 2 answer
+console.log(minLen2)
