@@ -45,10 +45,9 @@ let p2Max = p1Max[0]
 
 let p2result
 
-let isPositive = true
 let p2size = 4
 
-while(isPositive){
+while(true){
     let nextSize = findMax(p2size)
 
     if(nextSize[0]>=p2Max){
