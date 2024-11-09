@@ -9,4 +9,4 @@ console.log(lines.filter((x,ix,arr)=>ix<lines.length-1?x===arr[ix+1]:x===arr[0])
 // Part 2
 let len = lines.length
 let halflen = lines.length/2
-console.log(lines.filter((x,ix,arr)=>x === arr[(ix+halflen)%len]).reduce((acc,curr)=>acc+curr)) 
+console.log(lines.filter((x,ix,arr)=>x === arr[(ix+halflen)%len]).reduce((acc,curr)=>acc+curr))
