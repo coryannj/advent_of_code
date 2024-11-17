@@ -1,8 +1,3 @@
-const fs = require('fs');
-const input = fs.readFileSync('../day12input.txt',{ encoding: 'utf8', flag: 'r' });
-
-let lines = input.split(/[\r\n]+/).map((x)=>x.split(/[\W\s]+/).map(Number)).map((x)=>[x[0],x.slice(1)])
-
 let genA = 16807
 let genB = 48271
 let divisor = 2147483647
