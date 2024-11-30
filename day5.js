@@ -1,99 +1,64 @@
 const fs = require('fs');
 const input = fs.readFileSync('../day5input.txt',{ encoding: 'utf8', flag: 'r' });
+const lines = input.split(/\n\n/);
+const seeds = lines[0].split(' ').slice(1).map(Number);
+const maps = lines.slice(1).map((x,ix)=>x.split(/[\r\n]+/).slice(1).map((y,yx)=>y.split(' ').map(Number))).map((y)=>y.map((x,ix)=>[x[1],x[1]+x[2]-1,x[0]-x[1]]).sort((a,b)=>a[0]-b[0]));
 
-const lines = input.split(/[\r\n]+/)
-const splitregex = /[\w\s]+(?=[\|]|$)/gm
-mapregex = /(?<=\w:)[\d\]+[\d\s]+/gm
-const numregex = /\d+/gm
+// Part 1
+const lookup = (currVal,ranges) => {
+  let inRange = ranges.find(([start,end,offset])=>start<=currVal && end>=currVal)
 
-//Part 1
-let megamap = input.match(mapregex)
-
-const seedInt = megamap[0].match(numregex).map((x) => parseInt(x))
-
-let seedsoil = megamap[1].trim().split(/[\r\n]+/).map((x) => x.match(numregex)).map((x)=> x.map((y) => parseInt(y)))
-let soilfert = megamap[2].trim().split(/[\r\n]+/).map((x) => x.match(numregex)).map((x)=> x.map((y) => parseInt(y)))
-let fertwater = megamap[3].trim().split(/[\r\n]+/).map((x) => x.match(numregex)).map((x)=> x.map((y) => parseInt(y)))
-let waterlight = megamap[4].trim().split(/[\r\n]+/).map((x) => x.match(numregex)).map((x)=> x.map((y) => parseInt(y)))
-let lighttemp = megamap[5].trim().split(/[\r\n]+/).map((x) => x.match(numregex)).map((x)=> x.map((y) => parseInt(y)))
-let temphumid = megamap[6].trim().split(/[\r\n]+/).map((x) => x.match(numregex)).map((x)=> x.map((y) => parseInt(y)))
-let humidlocation = megamap[7].trim().split(/[\r\n]+/).map((x) => x.match(numregex)).map((x)=> x.map((y) => parseInt(y)))
-
-// Does one map
-function getMapValue(value,mapArray) {
-  let inMap = mapArray.filter((x) => x[1] < value && (x[1]+x[2])>value).flat()
-  let toMapValue
-  if (inMap.length > 0) {
-    let increment = value - inMap[1]
-    toMapValue = inMap[0] + increment    
+  if(!inRange){
+    return currVal
   } else {
-    toMapValue = value
+    return currVal+inRange[2]
   }
-  return toMapValue
 }
 
-// Gets location value for a seed value
-function seedlocation(seed) {
-  let step1 = getMapValue(seed,seedsoil)
-  let step2 = getMapValue(step1,soilfert)
-  let step3 = getMapValue(step2,fertwater)
-  let step4 = getMapValue(step3,waterlight)
-  let step5 = getMapValue(step4,lighttemp)
-  let step6 = getMapValue(step5,temphumid)
-  let step7 = getMapValue(step6,humidlocation)
-  return step7
-}
-
-// Part 1 answer
-console.log(Math.min(...seedInt.map((x) => seedlocation(x))))
+console.log(Math.min(...seeds.map((x)=>maps.reduce((acc,curr)=>lookup(acc,curr),x))))
 
 // Part 2
+let seedRanges = seeds.flatMap((x,ix,arr)=>ix % 2 === 0 ? [[x,x+arr[ix+1]-1]]:[]).sort((a,b)=>a[0]-b[0])
 
-let seeds = []
-let seedpair = []
-for ([index,val] of seedInt.entries()) {
-  if (index%2 != 1) {
-    seedpair = []
-    seedpair.push(val)
+const testOverlap = ([x1,x2],[y1,y2,offset]) => {
+    if(Math.max(x1,y1) <= Math.min(x2,y2)){
+      return [x2>y2 ? [y2+1,x2] : [],[x1<y1 ? [x1,y1-1] : [],[Math.max(x1,y1)+offset,Math.min(x2,y2)+offset]].filter((x)=>x.length>0)] // returns [<remaining interval after range>,[<interval before range + offset>,<interval within range + offset>]
+    } else {
+      return [[x1,x2],[]] // No overlap
+    }
+}
+
+const lookupRanges = ([rmin,rmax],ranges2) => {
+  if(rmax<ranges2[0][0]||rmin>ranges2.at(-1)[1]){
+    return [[rmin,rmax]]
   } else {
-    seedpair.push(val)
-    seeds.push(seedpair)
+    let newRanges = []
+    let next
+
+    for(i=0;i<ranges2.length;i++){
+      let [thisMin,thisMax,thisOffset] = ranges2[i]
+
+      next = testOverlap([rmin,rmax],[thisMin,thisMax,thisOffset])
+
+      if(next[1].length === 0){
+        if(i===ranges2.length-1 && next[0].length>0){
+          newRanges.push(next[0]) // Some interval past end of ranges
+        }
+        continue;
+      } else {
+        newRanges.push(...next[1])
+      }
+
+      if(next[0].length>0){
+          rmin = next[0][0]
+          rmax = next[0][1]
+      } else {
+        break;
+      }
+    }
+
+    return newRanges
   }
 }
 
-// Gets single map in reverse e.g. soil to seed
-function getReverseMapValue(value,mapArray) {
-  let inMap = mapArray.filter((x) => x[0] <= value && (x[0]+x[2])>=value).flat()
-  let toMapValue
-  if (inMap.length > 0) {
-    let increment = value - inMap[0]
-    toMapValue = inMap[1] + increment    
-  } else {
-    toMapValue = value
-  }
-  return toMapValue
-}
-
-// Gets single seed value for location value input
-function locationseed(location) {
-  //let step0 = getReverseMapValue(location,humidlocation) - not needed for location < 1094349260
-  //let step1 = getReverseMapValue(step0,temphumid)
-  let step1 = getReverseMapValue(location,temphumid)
-  let step2 = getReverseMapValue(step1,lighttemp)
-  let step3 = getReverseMapValue(step2, waterlight)
-  let step4 = getReverseMapValue(step3,fertwater)
-  let step5 = getReverseMapValue(step4,soilfert)
-  let step6 = getReverseMapValue(step5,seedsoil)
-  return step6
-}
-
-let j = 1094349260 // too lazy to code it - but in humidlocation map 0 -> 1094349260 is not ranged
-
-// HOLD ONTO YOUR BUTTS
-for(let i=1;i<j;i++) {
-  let seed = locationseed(i)
-  if (seeds.filter((x) => x[0] <= seed && (x[0]+x[1])>=seed).length > 0) {
-    console.log('seed is',seed,'i is ',i) // i is Part 2 answer
-    break
-  }
-}
+console.log(Math.min(...maps.reduce((acc,curr)=>acc.flatMap((x)=>lookupRanges(x,curr)),seedRanges).flat()))

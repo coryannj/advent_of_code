@@ -1,48 +1,27 @@
 const fs = require('fs');
 const input = fs.readFileSync('../day4input.txt',{ encoding: 'utf8', flag: 'r' });
-const lines = input.split(/[\r\n]+/)
 
+const lines = input.replaceAll('Card ','').split(/[\r\n]+/).map((x)=>x.split(/[:|]/).map((y)=>y.trim().split(/[\s]+/)))
 
 // Part 1
+const result = Array(25).fill(2).map((x,ix)=>Math.pow(x,ix))
 
-// Regexes
-const splitregex = /[\w\s]+(?=[\|]|$)/gm // gets winning numbers and your numbers
-const numregex = /\d+/gm
+let winning = lines.map(([x,y,z])=>{
+  let myNumbers = new Set(y)
+  let winningNumbers = new Set(z)
+  return myNumbers.intersection(winningNumbers).size
+})
 
-// Lookup array for points - padded with zero
-let result = [0,1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536,131072,262144,524288,1048576,2097152,4194304,8388608]
-
-let totalpoints=0
-
-for(line of lines) {
-  // Gets array of winning numbers
-  let winningnums = line.match(splitregex)[0].match(numregex)
-  let ournums = line.match(splitregex)[1].match(numregex)
-  let ourwinning = ournums.filter((x) => winningnums.includes(x))
-  ourwinning.length >0 ? totalpoints=totalpoints+result[ourwinning.length]:''
-}
-
-// Part 1 result
-console.log(totalpoints) 
+console.log(winning.map((x)=> result[x-1] || 0).reduce((acc,curr)=>acc+curr))
 
 // Part 2
 
-// Array for storing number of each scratchcard, all vals start with 1
-let scratchcards = Array(193).fill(1)
+let scratchcards = Object.fromEntries(winning.map((x,ix)=>[ix,1]))
 
-for ([index,val] of lines.entries()) {
-    // Gets array of winning numbers
-    let game = val.match(splitregex)[0].match(numregex)
-    let mynums = val.match(splitregex)[1].match(numregex)
-    let winning = mynums.filter(item=> game.includes(item))
-    let j = winning.length+1
+winning.forEach((score,index)=>{
+  for(i=1;i<=score;i++){
+    scratchcards[index+i]+=scratchcards[index]
+  }
+})
 
-    // Adds number of current scratchcards to subsequent scratchcard vals
-    for (let i=1;i<j;i++) {
-        scratchcards[index+i] = scratchcards[index+i] + scratchcards[index]
-    }
-}
-
-// Part 2 result
-console.log(scratchcards.reduce((acc,curr) => acc + curr,0))
-
+console.log(Object.values(scratchcards).reduce((a,c)=>a+c))

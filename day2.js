@@ -1,34 +1,20 @@
 const fs = require('fs');
-const inputload = fs.readFileSync('../day2input.txt',{ encoding: 'utf8', flag: 'r' });
-const input = inputload.split(/[\r\n]+/)
+const input = fs.readFileSync('../day2input.txt',{ encoding: 'utf8', flag: 'r' });
+const lines = input.replaceAll('Game ','').split(/[\r\n]+/).map((x)=>x.split(/[:,;]/)).map((x)=>x.map((y,yx)=>yx === 0 ? y : y.trim().split(' ').map((z,zx)=>zx===0?parseInt(z):z)))
+
+const gameIndexes = lines.map((x)=>parseInt(x[0]))
+const cubes1 = {red:12, green:13, blue:14}
 
 //Part 1
+const games = lines.map((x)=>x.slice(1).reduce(function (acc, curr) {
+    if(acc[curr[1]]===undefined){
+        return acc[curr[1]]=curr[0],acc
+    } else {
+        return acc[curr[1]] = Math.max(acc[curr[1]],curr[0]),acc
+    }
+  }, {}))
 
-//Regexes for game number and invalid games (e.g. >12 red,>13 green,>14 blue)
-let gameregex = /\d+(?=:)/g
-let rulesregex= /(1[3-9] red|[2-9][0-9] red|\d{3,} red|1[4-9] red|1[4-9] green|[2-9][0-9] green|\d{3,} green|1[5-9] blue|[2-9][0-9] blue|\d{3,} blue)/m
-
-//Map checks for rules breach, passes 0 if found or game number if not, then sums array
-let gamessum = input
-.map((x) => {
-    let notpossible = x.match(rulesregex)
-    return notpossible === null ? parseInt(x.match(gameregex)[0]) : 0
-}).reduce((acc,curr) => acc + curr,0)
-console.log(gamessum)
+console.log(games.map((x,ix)=>Object.entries(x).every(([k,v])=>v<=cubes1[k])?gameIndexes[ix]:0).reduce((acc,curr)=>acc+curr))
 
 // Part 2
-
-// Regex to get values for each colour
-const regexred = /\d+(?= red)/g
-const regexgreen = /\d+(?= green)/g
-const regexblue = /\d+(?= blue)/g
-
-// Map uses regex to get array of values for each colour, finds maximum for each and multiplies to get the power, then sums array
-let gamespowersum = input
-.map((x) => {
-    let maxred = Math.max(...x.match(regexred).map(Number))
-    let maxgreen = Math.max(...x.match(regexgreen).map(Number))
-    let maxblue = Math.max(...x.match(regexblue).map(Number))
-    return maxred*maxgreen*maxblue
-}).reduce((acc,curr) => acc + curr,0)
-console.log(gamespowersum)
+console.log(games.map((x)=>Object.values(x).reduce((acc,curr)=>acc*curr,1)).reduce((acc,curr)=>acc+curr))
