@@ -33,4 +33,4 @@ while(password2.includes('_')){
     counter2++
 }
 
-console.log(password2.join('')) // Part 2 answer
+console.log(password2.join('')) // Part 2 answer 
