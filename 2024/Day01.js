@@ -1,5 +1,5 @@
 const fs = require('fs');
-require('../advent_of_code_2024/utils.js');
+require('../utils.js');
 
 const input = fs.readFileSync('../2024/day1.txt',{ encoding: 'utf8', flag: 'r' });
 const inputE = fs.readFileSync('../2024/day1example.txt',{ encoding: 'utf8', flag: 'r' });
