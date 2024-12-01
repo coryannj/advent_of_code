@@ -8,8 +8,8 @@ function tls (lines,partNo) {
 
   for(i=0;i<lines.length;i++){
     let line = lines[i].slice();
-    let window = line.splice(0,windowLen-1);
-    window.unshift('_');
+    let window = ['_', ...line.splice(0,windowLen-1)];
+
     let outsideBracket = true;
     let outside = false;
     let inside = false;
@@ -39,21 +39,12 @@ function tls (lines,partNo) {
         }
       }
   
-      if(line[0]==='['){
+      if(line[0]==='[' || line[0]===']'){
+        outsideBracket = line[0]==='[' ? false : true;
         line.shift();
-        window = line.splice(0,windowLen-1);
-        window.unshift('_');
-        outsideBracket = false;
+        window = ['_', ...line.splice(0,windowLen-1)];
         continue;
       }
-      if(line[0]===']'){
-        line.shift();
-        window = line.splice(0,windowLen-1);
-        window.unshift('_');
-        outsideBracket = true;
-        continue;
-      }
-
     }
 
     if(tlsTest(partNo)){
