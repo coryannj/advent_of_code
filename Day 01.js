@@ -12,4 +12,4 @@ let col2 = lines.map((x)=>x[1]).sort((a,b)=>a-b)
 let col2Count = count(col2)
 
 console.log(col1.map((x,ix)=>Math.abs(x-col2[ix])).reduce((acc,curr)=>acc+curr)) // Part 1 answer
-console.log(col1.map((x)=>x*(col2Count[x]||0)).reduce((acc,curr)=>acc+curr)) // Part 2 answer
+console.log(col1.map((x)=>x*(col2Count[x]||0)).reduce((acc,curr)=>acc+curr)) // Part 2 answer 
