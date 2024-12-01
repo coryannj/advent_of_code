@@ -1,5 +1,5 @@
 const fs = require('fs');
-require('../utils.js');
+require('../../utils.js');
 const input = fs.readFileSync('../2016/day9input.txt',{ encoding: 'utf8', flag: 'r' });
 
 const arr1 = input.split('')
