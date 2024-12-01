@@ -9,7 +9,6 @@ function tls (lines,partNo) {
   for(i=0;i<lines.length;i++){
     let line = lines[i].slice();
     let window = ['_', ...line.splice(0,windowLen-1)];
-
     let outsideBracket = true;
     let outside = false;
     let inside = false;
@@ -23,7 +22,7 @@ function tls (lines,partNo) {
     const tlsTest = (partNo) => {
       return partNo === 1 ? outside && !inside : outside && inside && outABA.some((x)=>inABA.indexOf(`${x.charAt(1)}${x.charAt(0)}${x.charAt(1)}`) !== -1)
     }
-  
+
     while(line.length>0){
       window.shift();
       window.push(line.shift());
