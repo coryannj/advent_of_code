@@ -25,5 +25,5 @@ for (i=0;i<arr.length;i++){
         p2safe++
     }
 }
-console.log(arr.filter((x)=>[...new Set(x)].length<x.length))
+
 console.log('Part 1 answer is ',p1safe,' Part 2 answer is ',p1safe+p2safe)
