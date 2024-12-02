@@ -4,7 +4,7 @@ const input = fs.readFileSync('../../day2.txt', {encoding: "utf8", flag: "r", })
 
 let arr = input.lines().mk2d('\\s+',1)
 
-const isSafe = (a) => (a.join('') === a.sorta().join('')|| a.join('') === a.sortd().join('')) && (a.every((y,yx,yarr)=> yx ===yarr.length-1 || (Math.abs(y-yarr[yx+1])>=1 && Math.abs(y-yarr[yx+1])<=3)))
+const isSafe = (a) => {d = a.slice(0,-1).map((v,i)=> v-a[i+1]); return d.every((e)=> e > 0 && e < 4) || d.every((e)=> e < 0 && e > -4)}
 
 let safe = arr.flatMap((x,ix)=> isSafe(x) ? [ix]:[])
 
