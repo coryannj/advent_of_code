@@ -1,8 +1,8 @@
 const fs = require('fs');
 require('../utils.js');
 
-const input = fs.readFileSync('../2024/day1.txt',{ encoding: 'utf8', flag: 'r' });
-const inputE = fs.readFileSync('../2024/day1example.txt',{ encoding: 'utf8', flag: 'r' });
+const input = fs.readFileSync('../../day1.txt',{ encoding: 'utf8', flag: 'r' });
+//const inputE = fs.readFileSync('../2024/day1example.txt',{ encoding: 'utf8', flag: 'r' });
 
 let arr = input.lines().mk2d('\\s+',1)
 let col1 = arr.col(0).sorta()

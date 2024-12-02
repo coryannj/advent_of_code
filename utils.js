@@ -2,8 +2,8 @@
 Object.defineProperties(Array.prototype, {
     sum: { value: function (offset) { return this.map(Number).reduce((a, c) => a + c, offset||0); } },
     cumSum: { value: function (offset) { return this.map((sum = offset || 0, v => sum += v)); } },
-    sorta: { value: function () { return this.map(Number).sort((a, b) => a - b); } },
-    sortd: { value: function () { return this.map(Number).sort((a, b) => b - a); } },
+    sorta: { value: function () { return this.toSorted((a, b) => a - b); } },
+    sortd: { value: function () { return this.toSorted((a, b) => b - a); } },
     sort2a: { value: function (n) { return this.sort((a, b) => Number(a[n||0]) - Number(b[n||0])); } },
     sort2d: { value: function (n) { return this.sort((a, b) => Number(b[n||0]) - Number(a[n||0])); } },
     multiply: { value: function () { return this.map(Number).reduce((a, c) => a * c, 1); } },
