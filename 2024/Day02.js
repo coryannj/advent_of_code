@@ -10,4 +10,4 @@ let safe = arr.flatMap((x,ix)=> isSafe(x) ? [ix]:[])
 
 console.log(safe.length) // Part 1 answer
 
-console.log(arr.filter((x,ix)=>!safe.includes(ix)).filter((x)=>x.some((y,yx,yarr)=> isSafe(yarr.filter((z,zx)=> zx !== yx)))).length + safe.length) // Part 2 answer
+console.log(arr.filter((x,ix)=>!safe.includes(ix) &&x.some((y,yx,yarr)=> isSafe(yarr.filter((z,zx)=> zx !== yx)))).length + safe.length) // Part 2 answer
