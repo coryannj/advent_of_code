@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+
 // Utils - inspired by https://github.com/Camelpilot33
 Object.defineProperties(Array.prototype, {
     sum: { value: function (offset) { return this.map(Number).reduce((a, c) => a + c, offset||0); } },
@@ -14,9 +16,34 @@ Object.defineProperties(Array.prototype, {
     mk2d: { value: function (re,toNum) { let r = re ? new RegExp(`${re}`,"g") : ''; return this.map((x)=>!toNum ? x.split(r) : x.split(r).map(Number)) } },
     mapkv: { value: function (toNum) { return this[0].length === 2 ? this.map((e)=> !toNum ? [e[0],e[1]] : [e[0],Number(e[1])]) : this.map((e)=>!toNum ? [e[0],e.slice(1)]: [e[0],e.slice(1).map(Number)]) } },
     atMod: { value: function (n,offset) {return this[(n+(offset||0))%this.length] } },
+    pqShift: { value: function () {return this[this.findIndex((x)=>x.length>0)].shift() } },
+    step4: { value: function (rowLen,colLen) {let rLen = rowLen || Infinity, cLen = colLen||Infinity,[r,c]=this; return [[r+1,c],[r-1,c],[r,c+1],[r,c-1]].filter(([nr,nc])=> 0 <= nr && nr <= rLen && 0 <= nc && nc <= cLen) } },
+    step8: { value: function (rowLen,colLen) {let rLen = rowLen || Infinity, cLen = colLen||Infinity,[r,c]=this; return [[r+1,c],[r+1,c+1],[r,c+1],[r-1,c+1],[r-1,c],[r-1,c-1],[r,c-1],[r+1,c-1]].filter(([nr,nc])=> 0 <= nr && nr <= rLen && 0 <= nc && nc <= cLen) } },
   });
-  
+
 Object.defineProperties(String.prototype, {
     lines: {value: function (n) { let r = n || 1; return r === 1 ? this.split(/[\r\n]+/) : this.split(/\n\n/)} },
 });
 
+// Shoelace formula - taken from https://stackoverflow.com/questions/62323834/calculate-polygon-area-javascript
+const shoelace = (coords) => {
+  let area = 0;
+
+  for (let i = 0; i < coords.length; i++) {
+    const [x1, y1] = coords[i];
+    const [x2, y2] = coords[(i + 1) % coords.length];
+
+    area += x1 * y2 - x2 * y1
+  }
+
+ return Math.abs(area) / 2;
+}
+
+const md5 = (str) => crypto.createHash('md5').update(str).digest('hex');
+
+const gcd = (a, b) => b == 0 ? a : gcd (b, a % b)
+const lcm = (a, b) =>  a / gcd (a, b) * b
+
+module.exports = {
+  shoelace, md5, gcd, lcm
+};
