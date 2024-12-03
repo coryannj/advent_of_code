@@ -15,3 +15,7 @@ console.log(input.split(doRe).flatMap(x=>x.replace(dontRe,'').match(mulRe)?.mk2d
 console.log(eval(input.replaceAll(',','*').match(/(?<=mul)([(]\d+[*]\d+[)])/g).join('+')))
 
 console.log(eval(input.replaceAll(',','*').split(/do[(][)]/).map((x) => x.replace(/don[']t[(][)][\s\S]+/,'')).join('').match(/(?<=mul)([(]\d+[*]\d+[)])/g).join('+')))
+
+// P2 eval version with improved regex
+
+console.log(eval(input.replaceAll(/(don't\(\)[\s\S]*?do\(\))/g,'').replaceAll(',','*').match(/(?<=mul)([(]\d+[*]\d+[)])/g).join('+')))
