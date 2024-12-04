@@ -2,68 +2,45 @@ const fs = require("fs");
 require("../utils.js");
 const input = fs.readFileSync('../../day4.txt', {encoding: "utf8", flag: "r", });
 
+// Part 1
+
+// Extend grid to avoid bounds checking
 let arr = input.lines().map((x)=>'___'+x+'___')
 let collen = arr[0].length
 arr.unshift(...Array(3).fill(0).map((x)=>"_".repeat(collen)))
 arr.push(...Array(3).fill(0).map((x)=>"_".repeat(collen)))
-let rowlen = arr.length
 arr = arr.mk2d()
 
-const getLetter = (l) => arr.flatMap((x,xi)=>x.flatMap((y,yi)=>y===l ? [[xi,yi]] : []))
+const xmas = ([r,c]) => {
+    let ans = 'XMAS'
+    let result = 0
+    for(i=-1;i<=1;i++){
+        for(j=-1;j<=1;j++){
 
-let p1queue = getLetter('X')
-let p1Len = p1queue.length
-
-for(i=0;i<p1Len;i++){
-    let [r,c] = p1Len[i]
-
-    for(j=r+1;j<=r+3;j++){
-        for(k=c+1;k<3;k++){
-
+            if(i === 0 && j === 0) continue;
+            
+            let subResult = 0;
+            
+            for(k=1;k<=3;k++){
+                if(arr[r+(i*k)][c+(j*k)] !== ans[k]) break;
+                subResult++;
+            }
+            
+            if(subResult===3) result++
         }
     }
+    return result
 }
 
+let p1queue = arr.flatMap((x,xi)=> x.flatMap((y,yi)=>y==='X' ? [[xi,yi]] : []))
+let p1Len = p1queue.length
+let p1result = 0
 
-
-
-
-
-
-
-
-
-let all = arr.map((e,i)=>e.map((c,cx)=>[i,cx,c]))
-//console.log(all.flat())
-
-let queue = all.flat().filter((x)=>x[2]==='X')
-
-
-
-const xmas = ([r,c]) => {
-   return [
-        Array(4).fill([r,c]).map(([r,c],ix)=>[r,c+ix]),
-        Array(4).fill([r,c]).map(([r,c],ix)=>[r,c-ix]),
-        Array(4).fill([r,c]).map(([r,c],ix)=>[r+ix,c]),
-        Array(4).fill([r,c]).map(([r,c],ix)=>[r-ix,c]),
-        Array(4).fill([r,c]).map(([r,c],ix)=>[r+ix,c+ix]),
-        Array(4).fill([r,c]).map(([r,c],ix)=>[r+ix,c-ix]),
-        Array(4).fill([r,c]).map(([r,c],ix)=>[r-ix,c-ix]),
-        Array(4).fill([r,c]).map(([r,c],ix)=>[r-ix,c+ix]),
-    ].filter((x)=>x.every(([nr,nc])=>0<=nr && nr<rowlen && 0<=nc && nc<collen) && x.map(([nr,nc])=>arr[nr][nc]).join('')==='XMAS').length
+for(e=0;e<p1Len;e++){
+    p1result+=xmas(p1queue[e])
 }
 
-console.log(queue.map(([r,c,v])=>xmas([r,c])).sum())
+console.log(p1result)
 
-const mas = ([r,c]) => {
-   let next =  [[r-1,c-1],[r-1,c+1],[r,c],[r+1,c-1],[r+1,c+1]
-    ]
-
-    return next.every(([nr,nc])=>0<=nr && nr<rowlen && 0<=nc && nc<collen) && (next.map(([nr,nc])=>arr[nr][nc]).join('')==='MSAMS'||next.map(([nr,nc])=>arr[nr][nc]).join('')==='SSAMM'||next.map(([nr,nc])=>arr[nr][nc]).join('')==='MMASS'||next.map(([nr,nc])=>arr[nr][nc]).join('')==='SMASM')
-}
-
-//console.log(all.flat().filter((x)=>x[2]==='A'))
-
-
-console.log(all.flat().filter((x)=>x[2]==='A').filter((x)=>mas([x[0],x[1]])).length)
-
+// Part 2 lololololol wish I'd remembered this while solving
+console.log(input.match(/(?=(M|S).(M|S).{139}A.{139}(?!\2)(M|S).(?!\1)(M|S))/gsd).length) 
