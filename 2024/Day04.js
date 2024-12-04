@@ -30,7 +30,7 @@ for(h = 0; h < p1Len; h++){
 console.log(p1result)
 
 // Part 1 regex version
-console.log(input.match(/(?=XMAS|SAMX)/gs).length+input.match(/(?=X.{140}M.{140}A.{140}S|S.{140}A.{140}M.{140}X)/gs).length+input.match(/(?=X.{139}M.{139}A.{139}S|S.{139}A.{139}M.{139}X)/gs).length+input.match(/(?=X.{141}M.{141}A.{141}S|S.{141}A.{141}M.{141}X)/gs).length)
+console.log(input.match(/(?=XMAS|SAMX)/g).length+input.match(/(?=X.{140}M.{140}A.{140}S|S.{140}A.{140}M.{140}X)/gs).length+input.match(/(?=X.{139}M.{139}A.{139}S|S.{139}A.{139}M.{139}X)/gs).length+input.match(/(?=X.{141}M.{141}A.{141}S|S.{141}A.{141}M.{141}X)/gs).length)
 
 // Part 2 lololololol wish I'd remembered this while solving
-console.log(input.match(/(?=(M|S).(M|S).{139}A.{139}(?!\2)(M|S).(?!\1)(M|S))/gsd).length) 
+console.log(input.match(/(?=(M|S).(M|S).{139}A.{139}(?!\2)(M|S).(?!\1)(M|S))/gs).length) 
