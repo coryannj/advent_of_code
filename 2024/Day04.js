@@ -1,6 +1,6 @@
 const fs = require("fs");
 require("../utils.js");
-const input = fs.readFileSync('./2024/inputs/day4.txt', {encoding: "utf8", flag: "r", });
+const input = fs.readFileSync('./inputs/2024/day4.txt', {encoding: "utf8", flag: "r", });
 
 // Part 1
 
