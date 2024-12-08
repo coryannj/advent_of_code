@@ -37,18 +37,19 @@ for(const[k,v] of Object.entries(antennas)){
                 let changed = 0
                 let [nr1,nc1] = [r1+(rdiff*steps),c1+(cdiff*steps)]
                 let [nr2,nc2] = [r2-(rdiff*steps),c2-(cdiff*steps)]
-
-                if(0 <= nr1 && nr1 < rowlen && 0 <= nc1 && nc1 < collen){
+                
+                if(grid[nr1]?.[nc1]){
                     if(steps === 1) p1.add(`${nr1}_${nc1}`)
                     p2.add(`${nr1}_${nc1}`)
                     changed++
                 }
 
-                if(0 <= nr2 && nr2 < rowlen && 0 <= nc2 && nc2 < collen){
+                if(grid[nr2]?.[nc2]){
                     if(steps === 1 ) p1.add(`${nr2}_${nc2}`)
                     p2.add(`${nr2}_${nc2}`)
                     changed++
                 }
+
                 if(changed === 0) break;
                 steps++
             }
