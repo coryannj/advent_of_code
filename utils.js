@@ -8,7 +8,7 @@ Object.defineProperties(Array.prototype, {
     sortd: { value: function () { return this.map(Number).toSorted((a, b) => b - a); } },
     sort2a: { value: function (n) { return this.toSorted((a, b) => Number(a[n||0]) - Number(b[n||0])); } },
     sort2d: { value: function (n) { return this.toSorted((a, b) => Number(b[n||0]) - Number(a[n||0])); } },
-    multiply: { value: function () { return this.map(Number).reduce((a, c) => a * c, 1); } },
+    multiply: { value: function () { return this.reduce((a,b)=>a*b,1); } },
     col: { value: function (n) { return this.map((e)=>e[n]); } },
     counts: { value: function () { return this.reduce((a, c) => {return a[c] ? ++a[c] : a[c] = 1, a}, {}); } },
     chunks: { value: function (n) {let res = []; for (let i = 0; i < this.length; i += n) { res.push(this.slice(i, i + n)) } return res} },
