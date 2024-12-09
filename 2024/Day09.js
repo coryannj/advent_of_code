@@ -98,11 +98,11 @@ console.log(p1result,' ',v1-v0)
 // Part 2
 let p2result = 0;
 let p2CurrId = id-1;
-let p2CurrIndex = p2parsed.length-1;
+
 let t0 = performance.now()
-while(p2CurrIndex>0){
+while(p2CurrId>0){
     let [originalInd, p2FileId, p2FileLen] = p2parsed.pop();
-    let freeIndex = p2parsed.findIndex(([i,v,len])=> i < originalInd && v === '.' && len>=p2FileLen);
+    let freeIndex = p2parsed.findIndex(([i,v,len])=> v === '.' && len>=p2FileLen);
 
     if(freeIndex === -1){
         p2result += addFile(p2FileLen,p2FileId,originalInd);
@@ -117,7 +117,7 @@ while(p2CurrIndex>0){
     }
 
     --p2CurrId;
-    p2CurrIndex = p2parsed.length-1;
+
 }
 let t1 = performance.now()
 console.log(p2result,' ',t1-t0)
