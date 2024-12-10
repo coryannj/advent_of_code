@@ -4,7 +4,8 @@
   "description": "My Advent of Code Javascript solutions",
   "main": "utils.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "benchmark": "esbench"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/coryannj/advent_of_code/issues"
   },
-  "homepage": "https://github.com/coryannj/advent_of_code#readme"
+  "homepage": "https://github.com/coryannj/advent_of_code#readme",
+  "devDependencies": {
+    "esbench": "^0.7.0"
+  }
 }
