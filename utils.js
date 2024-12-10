@@ -50,5 +50,5 @@ const nextArr = ([r,c],grid,callback) => {
 }
 
 module.exports = {
-  shoelace, md5, gcd, lcm
+  shoelace, md5, gcd, lcm, nextArr
 };
