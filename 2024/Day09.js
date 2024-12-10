@@ -108,8 +108,12 @@ while(p2CurrId>0){
         p2result += addFile(p2FileLen,p2FileId,originalInd);
     } else {
         p2result += addFile(p2FileLen,p2FileId,p2parsed[freeIndex][0]);
-        p2parsed[freeIndex][0]+=p2FileLen;
-        p2parsed[freeIndex][2]-=p2FileLen;
+        if(p2parsed[freeIndex][2]===p2FileLen){
+            p2parsed.splice(freeIndex,1)
+        } else {
+            p2parsed[freeIndex][0]+=p2FileLen;
+            p2parsed[freeIndex][2]-=p2FileLen;
+        }
     }
     
     while(p2parsed.at(-1)[1]==='.'){
