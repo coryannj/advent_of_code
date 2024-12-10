@@ -44,6 +44,11 @@ const md5 = (str) => crypto.createHash('md5').update(str).digest('hex');
 const gcd = (a, b) => b == 0 ? a : gcd (b, a % b)
 const lcm = (a, b) =>  a / gcd (a, b) * b
 
+const nextArr = ([r,c],grid,callback) => {
+  let next = [[r+1,c],[r-1,c],[r,c+1],[r,c-1]].filter(([nr,nc])=>grid[nr]?.[nc] !== undefined)
+  return !callback ? next : next.filter((x,ix,arr) => condition(x,ix,arr))
+}
+
 module.exports = {
   shoelace, md5, gcd, lcm
 };
