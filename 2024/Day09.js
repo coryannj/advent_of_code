@@ -1,5 +1,8 @@
 const fs = require("fs");
 require("../utils.js");
+import { defineSuite } from "esbench";
+
+export default defineSuite(scene => {
 const input = fs.readFileSync('./inputs/2024/day9.txt', {encoding: "utf8", flag: "r", });
 const line = input.trim().split('').map(Number)
 const lineLen = line.length
@@ -15,6 +18,7 @@ let currFile = p1Split[fileIndex];
 let spaceIndex = p1Split[0];
 let p1SplitResult = 0
 let p0 = performance.now()
+scene.bench("Part 1 - without expansion", () => {
 for(i=1; i<lineLen; i++){
     if(fileIndex === i){
         p1SplitResult += addFile(currFile,fileId,spaceIndex);
@@ -49,6 +53,7 @@ for(i=1; i<lineLen; i++){
         }
     }
 }
+})
 let p1 = performance.now()
 console.log(p1SplitResult,' ',p1-p0)
 
@@ -123,5 +128,6 @@ while(p2CurrId>0){
     --p2CurrId;
 
 }
+})
 let t1 = performance.now()
 console.log(p2result,' ',t1-t0)
