@@ -1,7 +1,7 @@
 const fs = require("fs");
 require("../utils.js");
 const { nextArr } = require("../utils.js");
-const input = fs.readFileSync('./inputs/2024/day10.txt', {encoding: "utf8", flag: "r", });
+const input = fs.readFileSync('../inputs/2024/day10.txt', {encoding: "utf8", flag: "r", });
 const grid = input.lines().mk2d('',1).map((x,ix)=>x.map((y,yx)=>[ix,yx,y]))
 let queue = grid.flat().filter((x)=>x[2]===0).map((x)=>[x])
 
@@ -29,4 +29,4 @@ let t1 = performance.now()
 
 console.log(Object.values(p1).map((x)=>x.size).sum()) // P1 answer
 console.log(p2.size) // P2 answer
-console.log(t1-t0) // runtime
+console.log(t1-t0,' milliseconds') // runtime
