@@ -46,7 +46,7 @@ const lcm = (a, b) =>  a / gcd (a, b) * b
 
 const nextArr = ([r,c],grid,callback) => {
   let next = [[r+1,c],[r-1,c],[r,c+1],[r,c-1]].filter(([nr,nc])=>grid[nr]?.[nc] !== undefined)
-  return !callback ? next : next.filter(condition)
+  return !callback ? next : next.filter(callback)
 }
 
 module.exports = {
