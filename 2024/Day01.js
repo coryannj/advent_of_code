@@ -5,8 +5,8 @@ const input = fs.readFileSync('../../day1.txt',{ encoding: 'utf8', flag: 'r' });
 
 // Part 1 golf version
 let t=input
-let [l,r]=[/^\d+/gm,/\d+$/gm].map(x=>t.match(x).sort());a=l.reduce((a,c,i)=>a+Math.abs(+c-+r[i]),0)
-console.log(a)
+let [l,r]=[/^\d+/gm,/\d+$/gm].map(x=>t.match(x).sort());v=l.reduce((a,c,i)=>a+Math.abs(+c-+r[i]),0)
+console.log(v)
 
 // Non golf version
 let arr = input.lines().mk2d('\\s+',1)
