@@ -44,11 +44,36 @@ const md5 = (str) => crypto.createHash('md5').update(str).digest('hex');
 const gcd = (a, b) => b == 0 ? a : gcd (b, a % b)
 const lcm = (a, b) =>  a / gcd (a, b) * b
 
-const nextArr = ([r,c],grid,callback) => {
-  let next = [[r+1,c],[r-1,c],[r,c+1],[r,c-1]].filter(([nr,nc])=>grid[nr]?.[nc] !== undefined)
+// const nextArr = ([r,c],grid,callback) => {
+//   let next = [[r+1,c],[r,c+1],[r-1,c],[r,c-1]].filter(([nr,nc])=>grid[nr]?.[nc] !== undefined)
+//   return !callback ? next : next.filter(callback)
+// }
+
+const nextArr = (coOrd,factor,grid,callback) => {
+  let r,c
+  //console.log('coOrd,factor',coOrd,factor)
+  if(typeof coOrd === 'number'){
+    //console.log('type is number')
+    c = coOrd%factor
+    r = (coOrd-c)/factor
+    //console.log('r is ',r,' and c is ',c)
+
+  } else {
+    r = coOrd[0]
+    c = coOrd[1]
+  }
+
+  let next = [[r-1,c],[r,c+1],[r+1,c],[r,c-1]].filter(([nr,nc])=> !callback ? grid[nr]?.[nc] !== undefined : grid[nr]?.[nc] !== undefined && callback([nr,nc]))
+  //console.log('next is ',next)
+  return typeof coOrd === 'number' ? next.map(([nr,nc])=>(nr*factor)+nc) : next
+  //return !callback ? next : next.filter(callback)
+}
+
+const nextArr8 = ([r,c],grid,callback) => {
+  let next = [[r+1,c],[r+1,c+1],[r,c+1],[r-1,c+1],[r-1,c],[r-1,c-1],[r,c-1],[r+1,c-1]].filter(([nr,nc])=>grid[nr]?.[nc] !== undefined)
   return !callback ? next : next.filter(callback)
 }
 
 module.exports = {
-  shoelace, md5, gcd, lcm, nextArr
+  shoelace, md5, gcd, lcm, nextArr,nextArr8
 };
