@@ -35,32 +35,18 @@ while(queue.some((x)=>x.length>0)){
 
     let steps = nextStep(last).filter((x)=>!path.some((y)=>y.slice(0,2).join('|') === x.slice(0,2).join('|')))
 
-    if(steps.some(([sr,sc,sd])=>sr === endR && sc === endC)){
-        let laststep = steps.find((x)=>x[0]===endR && x[1] === endC)
-        let newEnd = []
-        if (ld === laststep[2]){
-            newEnd.push(score+1)
-            newEnd.push(path)
-            newEnd[1].push(laststep)
-        } else {
-            newEnd.push(score+1001)
-            newEnd.push(path)
-            newEnd[1].push(laststep)
-        }
-
-        if(newEnd[0]<=p1min){
-            p1min = newEnd[0]
-            p2.push(newEnd)
-        }
-    }
-
     steps.forEach(([nr,nc,nd])=>{
         let newPath = path.slice()
         newPath.push([nr,nc,nd])
         let newScore = nd === ld ? score+1 : score+1001
 
-        if(newScore<p1min){
-            queue[Math.floor(newScore/100)].push([newScore,newPath])
+        if(newScore<=p1min){
+            if(nr === endR && nc === endC){
+                p1min = newScore
+                p2.push([newScore,newPath])
+            } else {
+                queue[Math.floor(newScore/100)].push([newScore,newPath])
+            }
         }
     })
 }
