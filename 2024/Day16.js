@@ -17,7 +17,6 @@ const nextStep = ([sr,sc,dir]) => {
 let queue = Array(2000).fill('.').map((x)=>[])
 queue[0].push([0,[[startR,startC,'R']]])
 
-
 let p1min = 99999999
 let p2 = []
 
@@ -57,13 +56,11 @@ while(queue.some((x)=>x.length>0)){
 
     steps.forEach(([nr,nc,nd])=>{
         let newPath = path.slice()
-            
-        if(nd === ld){
-            newPath.push([nr,nc,nd])
-            queue[Math.floor((score+1)/100)].push([score+1,newPath])
-        } else {
-            newPath.push([nr,nc,nd])
-            queue[Math.floor((score+1001)/100)].push([score+1001,newPath])
+        newPath.push([nr,nc,nd])
+        let newScore = nd === ld ? score+1 : score+1001
+
+        if(newScore<p1min){
+            queue[Math.floor(newScore/100)].push([newScore,newPath])
         }
     })
 }
