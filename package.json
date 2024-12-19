@@ -19,5 +19,8 @@
   "homepage": "https://github.com/coryannj/advent_of_code#readme",
   "devDependencies": {
     "esbench": "^0.7.0"
+  },
+  "dependencies": {
+    "heapify": "^0.6.0"
   }
 }
