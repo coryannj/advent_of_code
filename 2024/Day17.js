@@ -10,15 +10,15 @@ let programs = p.chunks(2).slice(0,-1)
 function runPrograms(resultObj){
     while(resultObj.regA !== 0n){
         const opLookup = (o,[i,n]) => { return i===1 ? n : BigInt([n,n,n,n,o.regA,o.regB,o.regC,n][n])};
-        const op0 = (o,operand) => {o.regA = o.regA/(BigInt(Math.pow(2,Number(operand)))); return o};
-        const op1 = (o,operand) => {o.regB = o.regB ^ BigInt(operand); return o};
-        const op2 = (o,operand) => {o.regB = operand%BigInt(8); return o};
-        const op4 = (o) => {o.regB = o.regB^o.regC; return o};
-        const op5 = (o,operand) => {o.output.push(operand%BigInt(8)); return o};
-        const op6 = (o,operand) => {o.regB = o.regA/(BigInt(Math.pow(2,Number(operand)))); return o};
-        const op7 = (o,operand) => {o.regC = o.regA/(BigInt(Math.pow(2,Number(operand)))); return o};
-        
-        const opCodes = [op0,op1,op2,'',op4,op5,op6,op7];
+        const opCodes = {
+            0: (o,operand) => {o.regA = o.regA/(BigInt(Math.pow(2,Number(operand)))); return o},
+            1: (o,operand) => {o.regB = o.regB ^ BigInt(operand); return o},
+            2: (o,operand) => {o.regB = operand%BigInt(8); return o},
+            4: (o) => {o.regB = o.regB^o.regC; return o},
+            5: (o,operand) => {o.output.push(operand%BigInt(8)); return o},
+            6: (o,operand) => {o.regB = o.regA/(BigInt(Math.pow(2,Number(operand)))); return o},
+            7: (o,operand) => {o.regC = o.regA/(BigInt(Math.pow(2,Number(operand)))); return o}
+        }
 
         resultObj = programs.reduce((a,c)=>{ return opCodes[c[0]](a,opLookup(a,c)) }, resultObj)
     }
