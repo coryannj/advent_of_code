@@ -6,12 +6,9 @@ const nums = input.lines().map(Number).map((x)=>BigInt(x))
 const loops = 2000
 
 const nextSecret = (num) => {
-    let step1 = num*64n
-    num = (step1^num)%16777216n
-    let step2 = num/32n
-    num = (step2^num)%16777216n
-    let step3 = num*2048n
-    return (step3^num)%16777216n
+    num = ((num*64n)^num)%16777216n
+    num = ((num/32n)^num)%16777216n
+    return ((num*2048n)^num)%16777216n
 }
 
 let p1 = []
@@ -44,14 +41,4 @@ nums.forEach((n)=>{
 })
 
 console.log('Part 1 answer is ',p1.sum())
-
-// Part 2
-let p2Max = 0n
-
-Object.values(p2diffObj).forEach((x)=>{
-    if(x>p2Max){
-        p2Max = x
-    }
-})
-
-console.log('Part 2 answer is ',p2Max.toString())
+console.log('Part 2 answer is ',Object.values(p2diffObj).sortd()[0])
