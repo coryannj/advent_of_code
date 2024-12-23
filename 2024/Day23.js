@@ -4,13 +4,16 @@ const input = fs.readFileSync('../inputs/2024/day23.txt', {encoding: "utf8", fla
 
 const cMap = input.lines().mk2d('-')
 
-// Create adjacency list
+// Create adjacency list - loop
 let cObj = Object.fromEntries([...new Set(cMap.flat().map((x)=>[x,new Set()]))])
 
 cMap.forEach(([c1,c2])=>{
     cObj[c1].add(c2)
     cObj[c2].add(c1)
 })
+
+// Create adjacency list - 1-liner for fun
+//let cObj = input.split(/[\r\n]+/).map((x)=>x.split('-')).reduce((a,c)=>{return a[c[0]] ? a[c[0]].add(c[1]) : a[c[0]] = new Set([c[1]]), a[c[1]] ? a[c[1]].add(c[0]) : a[c[1]] = new Set([c[0]]), a},{})
 
 // Part 1
 let t0 = performance.now()
