@@ -44,14 +44,17 @@ console.log('Part 1 answer is ',p1,t1-t0,'ms')
 
 // Part 2
 let t2 = performance.now()
-let p2 = Object.entries(cObj).map(([k1,v1])=>
-            Object.entries(
+let p2 = Object.keys(
+            Object.entries(cObj).map(([k1,v1])=>
                 [...v1].map((k2)=>
-                    [...cObj[k1].intersection(cObj[k2])].concat(k1,k2).sort().join(',')).reduce((a, c) => {return a[c] ? ++a[c] : a[c] = 1, a}, {})
-                ).filter(([intKey,intCount])=>
-                    intKey.split(',').length === intCount+1
-                ).sort((a,c)=>c[1]-a[1])[0]
-         ).sort((a,c)=>c[1]-a[1])[0][0]
+                    [...cObj[k1].intersection(cObj[k2])].concat(k1,k2).sort().join(',')
+                ).filter((x,ix,arr)=>
+                    arr.indexOf(x) !== arr.lastIndexOf(x)
+                ).reduce((a, c) => {return a[c] ? ++a[c] : a[c] = 1, a}, {})
+            ).sort((a,c)=>
+                Object.values(c)-Object.values(a)
+            )[0]
+         )[0]
 let t3 = performance.now()
 
 console.log('Part 2 answer is ',p2,t3-t2,'ms')
