@@ -10,6 +10,7 @@ Object.defineProperties(Array.prototype, {
     sort2d: { value: function (n) { return this.toSorted((a, b) => Number(b[n||0]) - Number(a[n||0])); } },
     multiply: { value: function () { return this.reduce((a,b)=>a*b,1); } },
     col: { value: function (n) { return this.map((e)=>e[n]); } },
+    transpose: { value: function () { return this[0].map((x,ix)=>this.map((y)=>y[ix])); } },
     counts: { value: function () { return this.reduce((a, c) => {return a[c] ? ++a[c] : a[c] = 1, a}, {}); } },
     chunks: { value: function (n) {let res = []; for (let i = 0; i < this.length; i += n) { res.push(this.slice(i, i + n)) } return res} },
     cartesian: { value: function () { const cart = (head, ...tail) => {let res = []; const rem = tail.length > 0 ? cart(...tail) : [[]];for (let r of rem) for (let h of head) res.push([h, ...r]); return res}; return cart(...this) } },
