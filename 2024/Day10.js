@@ -11,22 +11,24 @@ let p2 = new Set()
 let t0 = performance.now()
 
 while(queue.length>0){
-    let next = queue.shift()
-    let [r,c,val] = next.at(-1)
-    const nextTest = (([nr,nc]) => grid[nr]?.[nc]?.[2]===val+1)  
+    let next = queue.shift();
+    let [r,c,val] = next.at(-1);
+    const nextTest = (([nr,nc]) => grid[nr]?.[nc]?.[2]===val+1);  
 
     if(val === 9){
-       p1[next[0].join('|')].add([r,c,val].join('|'))
-       p2.add(next.join('|'))
+       p1[next[0].join('|')].add([r,c,val].join('|'));
+       p2.add(next.join('|'));
     } else {
-        nextArr([r,c],grid,nextTest).forEach(([nr,nc])=>{
-            queue.push(next.concat([grid[nr][nc]]))
+        nextArr([r,c],0,grid,nextTest).forEach(([nr,nc])=>{
+            queue.push(next.concat([grid[nr][nc]]));
         })
     }    
 }
 
+let p1ans = Object.values(p1).map((x)=>x.size).sum()
+let p2ans = p2.size
 let t1 = performance.now()
 
-console.log(Object.values(p1).map((x)=>x.size).sum()) // P1 answer
-console.log(p2.size) // P2 answer
+console.log('Part 1 answer is ',p1ans) // P1 answer
+console.log('Part 2 answer is ',p2ans) // P2 answer
 console.log(t1-t0,' milliseconds') // runtime
