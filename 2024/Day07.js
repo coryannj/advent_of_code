@@ -1,6 +1,6 @@
 const fs = require("fs");
 require("../utils.js");
-const input = fs.readFileSync('./inputs/2024/day7.txt', {encoding: "utf8", flag: "r", });
+const input = fs.readFileSync('../inputs/2024/day7.txt', {encoding: "utf8", flag: "r", });
 
 // During contest I solved this via brute force by calculating cartestian product of all operators for arr.length-1, which took 830.676 seconds to run :-D 
 

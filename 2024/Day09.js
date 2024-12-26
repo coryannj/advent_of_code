@@ -3,7 +3,7 @@ require("../utils.js");
 import { defineSuite } from "esbench";
 
 export default defineSuite(scene => {
-const input = fs.readFileSync('./inputs/2024/day9.txt', {encoding: "utf8", flag: "r", });
+const input = fs.readFileSync('../inputs/2024/day9.txt', {encoding: "utf8", flag: "r", });
 const line = input.trim().split('').map(Number)
 const lineLen = line.length
 

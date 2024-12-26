@@ -1,6 +1,6 @@
 const fs = require("fs");
 require("../utils.js");
-const input = fs.readFileSync('./inputs/2024/day8.txt', {encoding: "utf8", flag: "r", });
+const input = fs.readFileSync('../inputs/2024/day8.txt', {encoding: "utf8", flag: "r", });
 
 const grid = input.lines().mk2d()
 let rowlen = grid.length

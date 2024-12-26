@@ -1,6 +1,6 @@
 const fs = require("fs");
 require("../utils.js");
-const input = fs.readFileSync('./inputs/2024/day6.txt', {encoding: "utf8", flag: "r", });
+const input = fs.readFileSync('../inputs/2024/day6.txt', {encoding: "utf8", flag: "r", });
 
 const a = input.split(/[\r\n]+/).map((x)=>x.split(''));
 let b = structuredClone(a).map((x)=>x.map((y)=>y==='#'?y:0))

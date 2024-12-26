@@ -1,6 +1,6 @@
 
 const fs = require("fs");
-const input = fs.readFileSync('./inputs/2024/day5.txt', {encoding: "utf8", flag: "r", });
+const input = fs.readFileSync('../inputs/2024/day5.txt', {encoding: "utf8", flag: "r", });
 
 let [rules,p] = input.split(/\n\n/);
 let ruleObj = Object.fromEntries(rules.split(/[\r\n]+/).map((x)=> [x,-1]));
