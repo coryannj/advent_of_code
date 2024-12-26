@@ -1,6 +1,6 @@
 const fs = require("fs");
 require("../utils.js");
-const input = fs.readFileSync('../../day3.txt', {encoding: "utf8", flag: "r", });
+const input = fs.readFileSync('../inputs/2024/day3.txt', {encoding: "utf8", flag: "r", });
 
 const mulRe = /(?<=mul\()(\d{1,3}[,]\d{1,3})(?=\))/g
 const doRe = /do\(\)/
