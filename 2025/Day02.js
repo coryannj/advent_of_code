@@ -81,7 +81,8 @@ const countInvalid = ([s,e], partNo) => {
 
     const getChunks = ([rs,re],size) => {
         let
-            sChunks = rs.toString().match(new RegExp('.{' + size + '}', 'g')).map(Number),eChunks = re.toString().match(new RegExp('.{' + size + '}', 'g')).map(Number),
+            sChunks = rs.toString().match(new RegExp('.{' + size + '}', 'g')).map(Number),
+            eChunks = re.toString().match(new RegExp('.{' + size + '}', 'g')).map(Number),
             sVal = sChunks[0]<sChunks[1] ? sChunks[0]+1 : sChunks[0],
             eVal = eChunks[0]<=eChunks[1] ? eChunks[0] : eChunks[0]-1,
             cLen = sChunks.length,
