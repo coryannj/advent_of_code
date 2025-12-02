@@ -19,9 +19,9 @@ const countInvalid = ([s,e], partNo) => {
         
         skipTwice = true;
         nextRange = [s,e];
+        skipChunks=true;
 
-        if(e<99999999){ // Max str length is 10, first odd number not prime is 9
-            skipChunks=true
+        if(e<99999999){ // Max str length is 10, first odd number not prime is 9    
             skipNextChunks=true
         }
     } 
