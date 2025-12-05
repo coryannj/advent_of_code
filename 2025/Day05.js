@@ -2,7 +2,7 @@ const fs = require('fs');
 require('../utils.js');
 const input = fs.readFileSync('../inputs/2025/day5.txt', {encoding: "utf8", flag: "r", });
 
-let [ranges,ids] = input.split(/\n\n/).map((x,i)=> i === 0 ? x.split(/\n/).map((y)=>y.split('-').map(Number)) : x.split(/\n/).map(Number))
+let [ranges,ids] = input.split(/\n\n/).map((x,i)=> i === 0 ? x.split(/\n/).map((y)=>y.split('-').map(Number)).sort((a,b)=> a[0]===b[0] ? a[1]-b[1] : a[0]-b[0]) : x.split(/\n/).map(Number))
 
 const mergeSortedRanges = (arr,[x2,y2]) => {
     let y1 = arr.at(-1)[1]
@@ -18,7 +18,6 @@ const mergeSortedRanges = (arr,[x2,y2]) => {
 let p1 = ids.filter((x)=> ranges.some(([s,e])=> x >= s && x <= e)).length
 
 let p2 = ranges
-            .sort((a,b)=> a[0]===b[0] ? a[1]-b[1] : a[0]-b[0])
             .reduce((a,c)=> mergeSortedRanges(a,c),[ranges.shift()])
             .reduce((a,c)=> a + (c[1]-c[0]+1), 0)
 
