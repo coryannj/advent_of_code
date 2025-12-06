@@ -6,7 +6,7 @@ let
     lines = input.split(/[\r\n]+/),
     opLine = lines.pop(),
     nums = lines,
-    operators = [...opLine.matchAll(/\S/g)].map((x)=>[x[0],x.index]),
+    operators = opLine.matchAll(/\S/g).map((x)=>[x[0],x.index]).toArray(),
     colLen = operators.length,
     lastMatchInd = 0,
     p1 = 0,
