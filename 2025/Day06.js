@@ -4,8 +4,8 @@ const input = fs.readFileSync('../inputs/2025/day6.txt', {encoding: "utf8", flag
 
 let
     lines = input.split(/[\r\n]+/),
-    nums = lines.slice(0,-1),
-    opLine = lines.at(-1),
+    opLine = lines.pop(),
+    nums = lines,
     operators = [...opLine.matchAll(/\S/g)].map((x)=>[x[0],x.index]),
     colLen = operators.length,
     lastMatchInd = 0,
