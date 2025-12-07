@@ -22,11 +22,8 @@ lines.filter((x)=>x.includes('^')).forEach((line)=>{
                 rKey=k+1
 
             p1++
-
-            if(lKey >= 0) paths.set(lKey, prevVal + (paths?.get(lKey) ?? 0));
-    
-            if(rKey < colLen) paths.set(rKey, prevVal + (paths?.get(rKey) ?? 0));
-            
+            paths.set(lKey, prevVal + (paths?.get(lKey) ?? 0))
+            paths.set(rKey, prevVal + (paths?.get(rKey) ?? 0))
             paths.delete(k)
         }
     })
