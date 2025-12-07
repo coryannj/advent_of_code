@@ -4,7 +4,6 @@ const input = fs.readFileSync('../inputs/2025/day7.txt', {encoding: "utf8", flag
 
 let
     lines = input.split(/[\r\n]+/).map((x)=>x.split('')),
-    colLen = lines[0].length,
     startRow = lines.shift(),
     startCol = startRow.indexOf('S'),
     paths = new Map([[startCol,1]]),
