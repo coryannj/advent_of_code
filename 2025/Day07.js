@@ -16,20 +16,17 @@ let
 lines.filter((x)=>x.includes('^')).forEach((line)=>{
     paths.keys().forEach((k)=>{ 
         if(line[k] === '^'){
-            p1++
             let
                 prevVal = paths.get(k),
                 lKey=k-1,
                 rKey=k+1
 
-            if(lKey >= 0){
-                paths.set(lKey, prevVal + (paths?.get(lKey) ?? 0))
-            }
-            
-            if(rKey < colLen){
-                paths.set(rKey, prevVal + (paths?.get(rKey) ?? 0))
-            }
+            p1++
 
+            if(lKey >= 0) paths.set(lKey, prevVal + (paths?.get(lKey) ?? 0));
+    
+            if(rKey < colLen) paths.set(rKey, prevVal + (paths?.get(rKey) ?? 0));
+            
             paths.delete(k)
         }
     })
