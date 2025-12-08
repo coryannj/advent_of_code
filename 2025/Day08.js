@@ -24,10 +24,14 @@ lines.values().forEach(([xi,xv])=>{
     })
 })
 
-for(const c of Object.values(distances)){
+let sortedDistances = Object.values(distances)
 
-    // Part 1 answer
-    if(counter === target) p1 = circuits.map((x)=>x.size).sort((a,b)=>b-a).slice(0,3).reduce((a,c)=>a*c,1)
+for(const c of sortedDistances){
+    // Part 1 answer - can break after 1000 iterations
+    if(counter === target){
+        p1 = circuits.map((x)=>x.size).sort((a,b)=>b-a).slice(0,3).reduce((a,c)=>a*c,1)
+        break;
+    } 
 
     counter++
     
@@ -41,14 +45,12 @@ for(const c of Object.values(distances)){
     circuits[cMin] = circuits[cMin].union(circuits[cMax])
     circuits.splice(cMax,1)
     cLen--
-
-    // Part 2 answer
-    if(cLen === 1){
-        p2 = [...c].map((x)=>lines[x][1]).map((x)=> x[0]).reduce((a,c)=>a*c,1)
-        break;
-    }
-    
 }
 
+// Find the highest index for an unmerged node in our distances array
+let p2Ind = circuits.flatMap((x)=> x.size === 1 ? [sortedDistances.findIndex((y)=>y.has([...x][0]))] : []).sort((a,b)=>b-a)[0]
+
+p2 = [...sortedDistances[p2Ind]].map((y)=>lines[y][1][0]).reduce((a,c)=>a*c,1)
+
 console.log('Part 1 answer is ',p1)
-console.log('Part 2 answer is ',p2)
+console.log('Part 2 answer is ',p2,t1-t0)
