@@ -3,18 +3,17 @@ require('../utils.js');
 const input = fs.readFileSync('../inputs/2025/day7.txt', {encoding: "utf8", flag: "r", });
 
 let
-    lines = input.split(/[\r\n]+/).map((x)=>x.split('')),
-    startRow = lines.shift(),
-    startCol = startRow.indexOf('S'),
+    lines = input.split(/[\r\n]+/),
+    startCol = lines.shift().indexOf('S'),
     paths = new Map([[startCol,1]]),
     p1 = 0,
     p2
-
+  
 // Below is little gross bc map keys inserted during forEach will also be iterated over - but it was least perf hit ¯\_(ツ)_/¯
 
 lines.filter((x)=>x.includes('^')).forEach((line)=>{
     paths.keys().forEach((k)=>{ 
-        if(line[k] === '^'){
+        if(line[k]==='^'){
             let
                 prevVal = paths.get(k),
                 lKey=k-1,

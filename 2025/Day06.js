@@ -3,9 +3,8 @@ require('../utils.js');
 const input = fs.readFileSync('../inputs/2025/day6.txt', {encoding: "utf8", flag: "r", });
 
 let
-    lines = input.split(/[\r\n]+/),
-    opLine = lines.pop(),
-    nums = lines,
+    nums = input.split(/[\r\n]+/),
+    opLine = nums.pop(),
     operators = opLine.matchAll(/\S/g).map((x)=>[x[0],x.index]).toArray(),
     colLen = operators.length,
     lastMatchInd = 0,

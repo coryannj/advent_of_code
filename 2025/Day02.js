@@ -5,6 +5,45 @@ const input = fs.readFileSync('../inputs/2025/day2.txt', {encoding: "utf8", flag
 let lines = input.split(",").map((x)=>x.split('-').map(Number))
 let linesLen = lines.length
 
+// Less bonkers brute force version ~200ms for both parts
+function* range([s,e]) {
+    while(s<=e){
+        yield s
+        s++
+    }
+}
+
+const isRepeatingp1 = (num) => {
+    let nStr = num.toString()
+    let len = nStr.length
+
+    return len%2===0 && (nStr+nStr).slice(len/2,(len/2)+len) === nStr
+}
+
+const isRepeatingp2 = (num) => {
+    let nStr = num.toString()
+    return (nStr+nStr).slice(1,-1).indexOf(nStr) !== -1
+}
+
+let p1 = lines.values().map((x)=>range(x).filter(isRepeatingp1).reduce((a,c)=>a+c,0)).reduce((a,c)=>a+c)
+
+let p2 = lines.values().map((x)=>range(x).filter(isRepeatingp2).reduce((a,c)=>a+c,0)).reduce((a,c)=>a+c)
+
+console.log('Part 1 answer is ',p1)
+console.log('Part 2 answer is ',p2)
+
+// Absolutely bonkers not brute force version
+
+// console.log((123*1000)+(123*1000000))
+// console.log(123*1001001)
+// console.log(12345*100001)
+
+//1 1 11 111 1111 11111 111111
+
+// 1 10 100 1000
+
+
+
 const countInvalid = ([s,e], partNo) => {
     let
         sum = 0,
@@ -143,6 +182,22 @@ console.log('Part 2 answer is ',p2ans,((t4-t3)).toFixed(3),'ms')
 //   return iterationCount;
 // }
 
+
+//sChunks = rs.toString().match(new RegExp('.{' + size + '}', 'g')).map(Number)
+// function* genInvalid ([s,e]) {
+//     let counter = 0
+
+
+// 1 - invalid
+// 2 - repeat/factor 1
+// 3 - factor 1
+// 4 - factor 1,2
+// 5 - factor 1
+// 6 - factor 1,2,3
+// 7 - factor 1
+// 8 - factor 1,2
+// 9 - factor 1,3
+// 10 - factory 1,2,5
 
 
 
