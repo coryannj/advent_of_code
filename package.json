@@ -21,6 +21,7 @@
     "esbench": "^0.7.0"
   },
   "dependencies": {
-    "heapify": "^0.6.0"
+    "heapify": "^0.6.0",
+    "javascript-lp-solver": "^0.4.24"
   }
 }
