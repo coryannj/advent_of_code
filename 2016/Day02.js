@@ -1,52 +1,49 @@
 const fs = require('fs');
-const input = fs.readFileSync('../2016/day2input.txt',{ encoding: 'utf8', flag: 'r' });
-const lines = input.split(/[\r\n]+/).map((x)=>x.split(''))
+require('../utils.js');
+const input = fs.readFileSync('../inputs/2016/day02.txt', {encoding: "utf8", flag: "r", });
 
-let keypad = [
-    [1,2,3],
-    [4,5,6],
-    [7,8,9]
-]
-
-let keypad2 = [
-    ['.', '.', 1, '.', '.'],
-    ['.', 2, 3, 4, '.'],
-    [5,6,7,8,9,],
-    ['.','A','B','C','.'],
-    ['.','.','D','.','.']
-]
-
-const move = ([r,c],dir,partNo) => {
-    let moveObj={
-        'U':[r-1,c],
-        'D':[r+1,c],
-        'R':[r,c+1],
-        'L':[r,c-1]
-    }
-
-    let next = moveObj[dir]
-    if(partNo === 1){
-        return next.every((x)=> 0 <= x && x <= 2) ? next : [r,c]
-    } else {
-        return next.every((x)=> 0 <= x && x <= 4) && keypad2[next[0]][next[1]] !== '.' ? next : [r,c]
-    }
+const keypad1 = {
+    1:{ R:'2', D:'4'},
+    2:{ L:'1', R:'3', D:'5'},
+    3:{ L:'2', D:'6'},
+    4:{ R:'5', U:'1', D:'7'},
+    5:{ L:'4', R:'6', U:'2', D:'8'},
+    6:{ L:'5', U:'3', D:'9'},
+    7:{ R:'8', U:'4'},
+    8:{ L:'7', R:'9', U:'5'},
+    9:{ L:'8', U:'6'}
 }
 
-// Part 1/2
-let button = [1,1]
-let code = []
+const keypad2 = {
+    1:{D:'3'},
+    2:{R:'3', D:'6'},
+    3:{L:'2', R:'4', U:'1', D:'7'},
+    4:{L:'3', D:'8'},
+    5:{R:'6'},
+    6:{L:'5', R:'7', U:'2', D:'A'},
+    7:{L:'6', R:'8', U:'3', D:'B'},
+    8:{L:'7', R:'9', U:'4', D:'C'},
+    9:{L:'8'},
+    A:{R:'B', U:'6'},
+    B:{L:'A', R:'C', U:'7', D:'D'},
+    C:{L:'B', U:'8'},
+    D:{U:'B'}
+}
 
-let button2 = [2,0]
-let code2 = []
+const lines = input.split(/\n/g).map((x)=>x.split(''))
 
-lines.forEach((line)=>{
-    line.forEach((d)=>{
-        button = move(button,d,1)
-        button2 = move(button2,d,2)
+const solve = (partNo) =>{
+    code = ''
+    button = '5'
+
+    lines.forEach((l)=>{
+        l.forEach((dir)=>{
+            button = (partNo === 1 ? keypad1[button]?.[dir] : keypad2[button]?.[dir])||button
+        })
+        code+=button
     })
-    code.push(button)
-    code2.push(button2)
-})
+    return code
+}
 
-console.log(code.map(([r,c])=>keypad[r][c]).join('')) // Part 1 answer
-console.log(code2.map(([r,c])=>keypad2[r][c]).join('')) // Part 2 answer
+console.log(solve(1))
+console.log(solve(2))
