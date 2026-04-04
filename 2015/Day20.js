@@ -1,40 +1,38 @@
 const fs = require('fs');
-const { highestFactor } = require('../inputs/utils.js');
 require('../inputs/utils.js');
-//const input = fs.readFileSync('../inputs/2015/day20.txt', {encoding: "utf8", flag: "r", });
 
-const input = 34000000
-//const input = 10000
-const uLimit = input/10
-//const uLimit = 1000
-let houses = Array(uLimit).fill(0).map((x)=>x)
+let memo = {}
 
-const factors = (n) => {
-    let result = []
-    //let limit = Math.floor(Math.sqrt(n))
-    for(i=1;i<=n/2;i++){
-        if(n%i === 0) result.push(i)
-    }
-    return result.concat(n)
-}
+const solve = (partNo) => {
+    const input = 34000000
 
+    const factors = (n, partNo) => {
+        let result = memo[n]
+        
+        if(!result){
+            result = []
 
-//console.log(factors(1600000).map((x)=>x*10).reduce((a,c)=>a+c))
+            for(i=1;i<=n/2;i++){
+                if(n%i === 0) result.push(i)
+            }
 
+            result.push(n)
+            memo[n] = result
+        }
 
-for(j=700000;j<uLimit;j++){
-    let f = factors(j).filter((x)=>(x+(49*x))>=j) // rollback for p1
-    let r = f.reduce((a,c)=>a+(c*11),0)// rollback for p1
-    //console.log(j,r,f)
-    if(r>=input){
-        console.log(j,r,f)
-        break
+        return partNo === 1 ? result : result.filter((x)=>(x*50)>=n)
     }
 
-    if(j%10000 === 0){
-        console.log(j,r,f.length,f)
-    } 
+    function* presents(partNo){
+        let counter = 750000
+
+        while(counter++){
+            yield [counter,factors(counter,partNo).reduce((a,c)=>a+(c*(partNo === 1 ? 10 : 11)),0)]
+        }
+    }
+
+    return presents(partNo).find(([ind,sum])=>sum>=input)[0]
 }
 
-
-
+console.log(solve(1)) // Part 1
+console.log(solve(2)) // Part 2
