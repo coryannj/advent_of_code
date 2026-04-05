@@ -43,27 +43,23 @@ const takeTurn = ([outcome,spend,state],spell,partNo) => {
 const solve = (partNo) => {
     let minSpend
     let queue = [[0,0,[[500,50,0],input.match(/\d+/g).map(Number),[0,0,0]]]]
-    let seen = new Set()
 
     while(!minSpend){
         let curr = [cOutcome,cSpend,cState] = queue.shift()
-        if(cSpend>minSpend) continue;
 
         allSpells
-            .filter((spell)=>cState[0][0]>=Math.abs(spells[spell][0][0][0]) && (!eKeys.includes(spell)||cState[2][eKeys.indexOf(spell)] <=1))
+            .filter((spell)=>
+                cState[0][0]>=Math.abs(spells[spell][0][0][0]) // Can afford spell
+                && (!eKeys.includes(spell)||cState[2][eKeys.indexOf(spell)] <=1)) // Not an active effect
             .forEach((spell)=>{
                 let thisTurn = takeTurn(curr,spell,partNo)
 
                 if(thisTurn[0] === 0){
-                    let seenKey = thisTurn.join('_')
-                    if(!seen.has(seenKey)){
-                        seen.add(seenKey)
-                        queue.push(thisTurn)
-                    }
+                    queue.push(thisTurn)
                 }
                 
                 if (thisTurn[0] === 1){
-                    minSpend = thisTurn[1]
+                    minSpend = thisTurn[1] // First found was answer for my input *shrug*
                 }
         })
     }
