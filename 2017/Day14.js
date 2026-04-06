@@ -11,7 +11,7 @@ const len = 128
 
 let grid = Array(len).fill().map((x,i)=>hex2bin(solve(input+'-'+i,2)).replaceAll('1','#').replaceAll('0','.'))
 
-console.log(grid.join('').replaceAll('.','').length) // Part 1
+console.log('Part 1 ' ,grid.join('').replaceAll('.','').length) // Part 1
 
 // Part 2
 let queue = grid.flatMap((x,xi)=>x.split('').flatMap((y,yi)=> y === '#' ? [[xi,yi]]: []))
@@ -30,8 +30,10 @@ while(queue.length){
     let len
 
     do{
+        let queue = thisRegion.slice(len||0)
+
         len = thisRegion.length
-        thisRegion.forEach(([tr,tc])=>{
+        queue.forEach(([tr,tc])=>{
             nextArr([tr,tc]).forEach(([nr,nc])=>{
                 thisRegion.push([nr,nc])
                 seen.add(`${nr}_${nc}`)
@@ -41,4 +43,4 @@ while(queue.length){
     allRegions.push(thisRegion)
 }
 
-console.log(allRegions.length)
+console.log('Part 2 ',allRegions.length)
