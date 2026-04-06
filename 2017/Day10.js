@@ -2,7 +2,7 @@ const fs = require('fs');
 require('../inputs/utils.js');
 const input = fs.readFileSync('../inputs/2017/day10.txt', {encoding: "utf8", flag: "r", });
 
-const solve = (partNo) => {
+const solve = (input,partNo) => {
     let 
         lengths = partNo === 1 ? input.split(',').map(Number) : input.split('').map((x)=>x.charCodeAt(0)).concat([17, 31, 73, 47, 23]),
         listLen = 256,
@@ -34,5 +34,9 @@ return partNo === 1 ? list[0]*list[1] : list.chunks(16).map((x)=>(x.reduce((a,c)
 
 }
 
-console.log(solve(1))
-console.log(solve(2))
+console.log(solve(input,1))
+console.log(solve(input,2))
+
+module.exports = {
+  solve
+};
