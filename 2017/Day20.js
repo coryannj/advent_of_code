@@ -15,29 +15,28 @@ const solve = (partNo) => {
     let distances = partNo === 1 ? Array(buffer.length).fill().map((x)=>0) : []
 
     while(rounds--){
-    let seen = new Set()
-    let duplicate = new Set()
+        let seen = new Set()
+        let duplicate = new Set()
 
-    particles = particles.map((x,i)=>{
-        let nVal = update(x)
-        
-        if(partNo === 1){
-            distances[i]+=manhattan(nVal,[0,0,0])
-        } else {
-            let key = nVal[1][0].join('_')
+        particles = particles.map((x,i)=>{
+            let nVal = update(x)
             
-            if(!seen.has(key)){
-                seen.add(key)
+            if(partNo === 1){
+                distances[i]+=manhattan(nVal,[0,0,0])
             } else {
-                duplicate.add(key)
-            }
-        } 
-        
-        return nVal
-    })
+                let key = nVal[1][0].join('_')
+                
+                if(!seen.has(key)){
+                    seen.add(key)
+                } else {
+                    duplicate.add(key)
+                }
+            } 
+            
+            return nVal
+        })
 
-    if(partNo === 2) particles = particles.filter(([i,[p,v,a]])=> !duplicate.has(p.join('_')))
-
+        if(partNo === 2) particles = particles.filter(([i,[p,v,a]])=> !duplicate.has(p.join('_')))
     }
 
     return partNo === 1 ? distances.indexOf(Math.min(...distances)) : particles.length
