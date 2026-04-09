@@ -1,62 +1,46 @@
 const fs = require('fs');
-const input = fs.readFileSync('../day5input.txt',{ encoding: 'utf8', flag: 'r' });
+require('../inputs/utils.js');
+const input = fs.readFileSync('../inputs/2019/day05.txt', {encoding: "utf8", flag: "r", });
 
 let lines = input.split(',').map(Number)
-console.log(Number('02'))
 
-let program = lines.slice()
-program[1] = 12
-program[2] = 2
+const solve = (arr,inputVal) => {
+    let currInd = 0
+    //arr=arr.with(1,noun).with(2,verb)
+    let output
 
-let currIndex = 0
+    const ops = {
+        1:(aPos,bPos,a,b,c) => arr = arr.with(c,(aPos === 0 ? arr[a] : a)+(bPos === 0 ? arr[b] : b)),
+        2:(aPos,bPos,a,b,c) => arr = arr.with(c,(aPos === 0 ? arr[a] : a)*(bPos === 0 ? arr[b] : b)),
+        3:(c) => arr = arr.with(c,inputVal),
+        4:(c) => output = arr[c],
+        5:(aPos,bPos,a,b) =>currInd = (aPos === 0 ? arr[a] : a) !== 0 ? (bPos === 0 ? arr[b] : b) : currInd+3, 
+        6:(aPos,bPos,a,b) =>currInd = (aPos === 0 ? arr[a] : a) === 0 ? (bPos === 0 ? arr[b] : b) : currInd+3, 
+        7:(aPos,bPos,a,b,c) => arr[c] = (aPos === 0 ? arr[a] : a)<(bPos === 0 ? arr[b] : b) ? 1 : 0,
+        8:(aPos,bPos,a,b,c) => arr[c] = (aPos === 0 ? arr[a] : a)===(bPos === 0 ? arr[b] : b) ? 1 : 0,
 
-while(program[currIndex]!==99){
-    let [opCode,input1,input2,output] = program.slice(currIndex,currIndex+5)
-        
-    if(opCode === 1){
-        program[output] = program[input1]+program[input2]
-    } else if (opCode === 2) {
-        program[output] = program[input1]*program[input2]
-    } else if (opCode === 3) {
-
-    } else {
-        //opCode === 4
     }
-    currIndex+=5
-}
 
-console.log('Part 1 answer is ',program[0])
+    while(`${arr[currInd]}`.slice(-2) !== '99'){
+        let op = `${arr[currInd]}`.padStart(5,'0').split('')
+        let [a,b,c] = op.splice(0,3)
 
-function causeOutput(noun,verb){
-    let p2program = lines.slice()
-    p2program[1] = noun
-    p2program[2] = verb
-
-    let currIndex = 0
-
-    while(p2program[currIndex]!==99){
-        let [opCode,input1,input2,output] = p2program.slice(currIndex,currIndex+4)
-            
-        if(opCode === 1){
-            p2program[output] = p2program[input1]+p2program[input2]
+        if('34'.includes(op[1])){
+            let arg = arr[currInd+1]
+            ops[op[1]](arg)
+            currInd+=2
+        } else if('56'.includes(op[1])){
+            let args = arr.slice(currInd+1,currInd+3)
+            ops[op[1]](+c,+b,...args)
         } else {
-            p2program[output] = p2program[input1]*p2program[input2]
-        }
-        currIndex+=4
-    }
-
-    return p2program[0]
-}
-
-let thisOutput
-
-p2:
-for(i=0;i<100;i++){
-    for(j=0;j<100;j++){
-        thisOutput = causeOutput(i,j)
-        if(thisOutput===19690720){
-            console.log('Part 2 answer is ',(100*i)+j)
-            break p2;
+            let args = arr.slice(currInd+1,currInd+4)
+            ops[op[1]](+c,+b,...args)
+            currInd+=4
         }
     }
+    
+    return output
 }
+
+console.log(solve(lines,1))
+console.log(solve(lines,5))

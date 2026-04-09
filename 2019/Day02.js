@@ -1,57 +1,34 @@
 const fs = require('fs');
-const input = fs.readFileSync('../day2input.txt',{ encoding: 'utf8', flag: 'r' });
+require('../inputs/utils.js');
+const input = fs.readFileSync('../inputs/2019/day02.txt', {encoding: "utf8", flag: "r", });
 
 let lines = input.split(',').map(Number)
 
-let program = lines.slice()
-program[1] = 12
-program[2] = 2
+const solve = (arr,noun,verb) => {
+    let currInd = 0
+    arr=arr.with(1,noun).with(2,verb)
 
-let currIndex = 0
-
-while(program[currIndex]!==99){
-    let [opCode,input1,input2,output] = program.slice(currIndex,currIndex+4)
-        
-    if(opCode === 1){
-        program[output] = program[input1]+program[input2]
-    } else {
-        program[output] = program[input1]*program[input2]
-    }
-    currIndex+=4
-}
-
-console.log('Part 1 answer is ',program[0])
-
-function causeOutput(noun,verb){
-    let p2program = lines.slice()
-    p2program[1] = noun
-    p2program[2] = verb
-
-    let currIndex = 0
-
-    while(p2program[currIndex]!==99){
-        let [opCode,input1,input2,output] = p2program.slice(currIndex,currIndex+4)
-            
-        if(opCode === 1){
-            p2program[output] = p2program[input1]+p2program[input2]
-        } else {
-            p2program[output] = p2program[input1]*p2program[input2]
-        }
-        currIndex+=4
+    const ops = {
+        1:(a,b,c) => arr = arr.with(c,arr[a]+arr[b]),
+        2:(a,b,c) => arr = arr.with(c,arr[a]*arr[b])
     }
 
-    return p2program[0]
+    while(arr[currInd] !== 99){
+        let [op,a,b,c] = arr.slice(currInd,currInd+4)
+        ops[op](a,b,c)
+        currInd+=4
+    }
+    
+    return arr[0]
 }
 
-let thisOutput
+console.log(solve(lines,12,2))
 
-p2:
 for(i=0;i<100;i++){
     for(j=0;j<100;j++){
-        thisOutput = causeOutput(i,j)
-        if(thisOutput===19690720){
-            console.log('Part 2 answer is ',(100*i)+j)
-            break p2;
+        if(solve(lines,i,j) === 19690720){
+            console.log((100*i)+j)
+            break;
         }
     }
 }
